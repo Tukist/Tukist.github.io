@@ -8,7 +8,7 @@
 :root{--bg:#0a0a0a;--fg:#33ff33;--fd:#1a7a1a;--fa:#00ff41;--ff:'Courier New','IBM Plex Mono','Consolas',monospace}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
-body{font-family:var(--ff);font-size:14px;color:var(--fg);background:var(--bg);text-shadow:0 0 3px rgba(51,255,51,.3)}
+body{font-family:'Cascadia Code','Consolas','Courier New',monospace;font-size:14px;color:var(--fg);background:var(--bg);text-shadow:0 0 3px rgba(51,255,51,.3)}
 
 .crt{position:fixed;inset:0;pointer-events:none;z-index:9999}
 .crt::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px)}
@@ -70,6 +70,7 @@ function newPrompt(){
   out.appendChild(d);
   inline=i;
   inline.focus();
+  inline.addEventListener('keydown',handleKey);
   out.scrollTop=out.scrollHeight;
 }
 
@@ -107,8 +108,7 @@ function exec(input){
 }
 
 // ── Input handling ──
-out.addEventListener('keydown',function(e){
-  if(!inline)return;
+function handleKey(e){
   if(e.key==='Enter'){
     e.preventDefault();
     var txt=inline.textContent.trim();
@@ -136,7 +136,7 @@ out.addEventListener('keydown',function(e){
     // Allow normal typing
     A.tick();
   }
-});
+}
 
 // Click to focus
 out.addEventListener('click',function(){
