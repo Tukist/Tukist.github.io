@@ -33,7 +33,7 @@ body{font-family:'Cascadia Code','Consolas','Courier New',monospace;font-size:14
 <div class="crt"></div><div class="noise"></div>
 <div class="term"><div id="out"></div></div>
 <script>
-var out=document.getElementById("out"),inline,history=[],histIdx=-1;
+var out=document.getElementById("out"),inline,hst=[],hstIdx=-1;
 
 var A={ctx:null,init(){try{this.ctx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}},
 p(f,d,t){if(!this.ctx)this.init();if(!this.ctx)return;var o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=t||"square";o.frequency.value=f;g.gain.setValueAtTime(.03,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,this.ctx.currentTime+d);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+d)},
@@ -91,7 +91,7 @@ appendLine("  skills          - Skills");
 appendLine("  contact, links  - Contact info");
 appendLine("  game, ski       - ASCII Ski game");
 appendLine("  clear, cls      - Clear screen");
-appendLine("  history         - Command history");
+appendLine("  hst         - Command hst");
 };
 cmds.about=function(){cmds.whoami()};
 cmds.whoami=function(){
@@ -132,9 +132,9 @@ setTimeout(function(){window.open("/#game","_blank")},200);
 };
 cmds.clear=function(){cmds.cls()};
 cmds.cls=function(){out.innerHTML="";newPrompt()};
-cmds.history=function(){
-appendLine("<span class=c-acc>history</span>");
-history.forEach(function(h,i){appendLine("  "+String(i+1).padStart(3)+"  "+h)});
+cmds.hst=function(){
+appendLine("<span class=c-acc>hst</span>");
+hst.forEach(function(h,i){appendLine("  "+String(i+1).padStart(3)+"  "+h)});
 };
 
 function exec(input){
@@ -154,16 +154,16 @@ curLine.removeChild(curLine.querySelector(".cursor"));
 inline.removeEventListener("keydown",handleKey);
 curLine.removeChild(inline);
 curLine.innerHTML+="<span>"+txt.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</span>";
-history.push(txt);histIdx=history.length;
+hst.push(txt);hstIdx=hst.length;
 if(txt)exec(txt);
 newPrompt();
 }else if(e.key==="ArrowUp"){
 e.preventDefault();
-if(histIdx>0){histIdx--;inline.value=history[histIdx]}
+if(hstIdx>0){hstIdx--;inline.value=hst[hstIdx]}
 }else if(e.key==="ArrowDown"){
 e.preventDefault();
-if(histIdx<history.length-1){histIdx++;inline.value=history[histIdx]}
-else{histIdx=history.length;inline.value=""}
+if(hstIdx<hst.length-1){hstIdx++;inline.value=hst[hstIdx]}
+else{hstIdx=hst.length;inline.value=""}
 }else if(e.key==="Tab"){
 e.preventDefault();
 var v=inline.value.toLowerCase(),keys=Object.keys(cmds);
