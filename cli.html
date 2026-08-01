@@ -10,7 +10,6 @@
 html,body{height:100%;overflow:hidden}
 body{font-family:var(--ff);font-size:14px;color:var(--fg);background:var(--bg);text-shadow:0 0 3px rgba(51,255,51,.3)}
 
-/* CRT overlay */
 .crt{position:fixed;inset:0;pointer-events:none;z-index:9999}
 .crt::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px)}
 .crt::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.5) 100%);animation:flicker .15s infinite alternate}
@@ -20,24 +19,20 @@ body{font-family:var(--ff);font-size:14px;color:var(--fg);background:var(--bg);t
 .noise::after{content:'';position:absolute;inset:-50%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px 128px;animation:noise .8s steps(4) infinite}
 @keyframes noise{0%,100%{transform:translate(0,0)}25%{transform:translate(-10%,5%)}50%{transform:translate(5%,-10%)}75%{transform:translate(-5%,15%)}}
 
-/* Terminal */
 .term{height:100%;display:flex;flex-direction:column;position:relative;z-index:1}
-.output{flex:1;overflow-y:auto;padding:1rem 1.2rem;white-space:pre-wrap;word-break:break-all;font-size:.82rem;line-height:1.5;scroll-behavior:smooth}
-.output::-webkit-scrollbar{width:6px}
-.output::-webkit-scrollbar-track{background:var(--bg)}
-.output::-webkit-scrollbar-thumb{background:var(--fd)}
-.input-line{display:flex;align-items:center;padding:.5rem 1.2rem;border-top:1px solid var(--fd);background:rgba(10,10,10,.95);flex-shrink:0}
-.prompt{color:var(--fa);white-space:nowrap;font-size:.82rem}
-#cmd{flex:1;background:none;border:none;color:var(--fg);font-family:var(--ff);font-size:.82rem;outline:none;caret-color:var(--fa);text-shadow:0 0 3px rgba(51,255,51,.3)}
-#cmd::placeholder{color:var(--fd)}
+#out{flex:1;overflow-y:auto;padding:.8rem 1rem;font-size:.75rem;line-height:1.35;white-space:pre-wrap;word-break:break-all}
+#out::-webkit-scrollbar{width:6px}
+#out::-webkit-scrollbar-track{background:var(--bg)}
+#out::-webkit-scrollbar-thumb{background:var(--fd)}
 
-.c-err{color:#ff4444}.c-accent{color:var(--fa)}.c-dim{color:var(--fd)}.c-bold{font-weight:700}
+.line{min-height:1.35em}
+.prompt{color:var(--fa)}
+.cursor{color:var(--fa);animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+#inline{outline:none;caret-color:transparent}
+
+.c-err{color:#ff4444}.c-acc{color:var(--fa)}.c-dim{color:var(--fd)}.c-bold{font-weight:700}
 .c-link{color:var(--fa);text-decoration:underline;cursor:pointer}
-.br-art{font-family:var(--ff);font-size:.62rem;line-height:1.44;letter-spacing:0;white-space:pre;color:var(--fd)}
-
-/* Help table */
-.help-table{display:grid;grid-template-columns:auto 1fr;gap:.3rem 1.5rem;margin:.5rem 0}
-.help-table span:nth-child(odd){color:var(--fa)}
 </style>
 </head>
 <body>
@@ -45,79 +40,198 @@ body{font-family:var(--ff);font-size:14px;color:var(--fg);background:var(--bg);t
 <div class="crt"></div>
 <div class="noise"></div>
 
-<div class="term" id="term">
-  <div class="output" id="out"></div>
-  <div class="input-line">
-    <span class="prompt" id="prompt">tukist@cli:~$&nbsp;</span>
-    <input type="text" id="cmd" placeholder="type help to begin..." autofocus autocomplete="off" spellcheck="false">
-  </div>
+<div class="term">
+  <div id="out"></div>
 </div>
 
 <script>
+var out=document.getElementById('out'),inline,history=[],histIdx=-1,cwd='~',
+    locked='';  // everything before current prompt, locked from editing
+
 // ── Audio ──
 var A={ctx:null,init(){try{this.ctx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}},
   p(f,d,t){if(!this.ctx)this.init();if(!this.ctx)return;var o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=t||'square';o.frequency.value=f;g.gain.setValueAtTime(.03,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,this.ctx.currentTime+d);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+d)},
-  tick(){this.p(800,.03)}, enter(){this.p(500,.05)}, err(){this.p(150,.2,'sawtooth')}
+  tick(){this.p(800,.025)},enter(){this.p(500,.05)},err(){this.p(150,.2,'sawtooth')}
 };
 document.addEventListener('click',function(){A.init()},{once:true});
 
-var out=document.getElementById('out'),cmd=document.getElementById('cmd'),
-    prompt=document.getElementById('prompt'),term=document.getElementById('term'),
-    history=[],histIdx=-1,cwd='~';
+function el(t,c){var d=document.createElement(t);if(c)d.className=c;return d}
 
-function write(html){out.innerHTML+=html;out.scrollTop=out.scrollHeight}
-function writeln(html){write(html+'\n')}
-
-function banner(){
-  writeln('');
-  writeln('<span class="c-accent" style="letter-spacing:-0.05em;line-height:0.03em;display:inline-block">' + '⣇⣿⠘⣿⣿⣿⡿⡿⣟⣟⢟⢟⢝⠵⡝⣿⡿⢂⣼⣿⣷⣌⠩⡫⡻⣝⠹⢿⣿⣷\n⡆⣿⣆⠱⣝⡵⣝⢅⠙⣿⢕⢕⢕⢕⢝⣥⢒⠅⣿⣿⣿⡿⣳⣌⠪⡪⣡⢑⢝⣇\n⡆⣿⣿⣦⠹⣳⣳⣕⢅⠈⢗⢕⢕⢕⢕⢕⢈⢆⠟⠋⠉⠁⠉⠉⠁⠈⠼⢐⢕⢽\n⡗⢰⣶⣶⣦⣝⢝⢕⢕⠅⡆⢕⢕⢕⢕⢕⣴⠏⣠⡶⠛⡉⡉⡛⢶⣦⡀⠐⣕⢕\n⡝⡄⢻⢟⣿⣿⣷⣕⣕⣅⣿⣔⣕⣵⣵⣿⣿⢠⣿⢠⣮⡈⣌⠨⠅⠹⣷⡀⢱⢕\n⡝⡵⠟⠈⢀⣀⣀⡀⠉⢿⣿⣿⣿⣿⣿⣿⣿⣼⣿⢈⡋⠴⢿⡟⣡⡇⣿⡇⡀⢕\n⡝⠁⣠⣾⠟⡉⡉⡉⠻⣦⣻⣿⣿⣿⣿⣿⣿⣿⣿⣧⠸⣿⣦⣥⣿⡇⡿⣰⢗⢄\n⠁⢰⣿⡏⣴⣌⠈⣌⠡⠈⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣬⣉⣉⣁⣄⢖⢕⢕⢕\n⡀⢻⣿⡇⢙⠁⠴⢿⡟⣡⡆⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣵⣵⣿\n⡻⣄⣻⣿⣌⠘⢿⣷⣥⣿⠇⣿⣿⣿⣿⣿⣿⠛⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n⣷⢄⠻⣿⣟⠿⠦⠍⠉⣡⣾⣿⣿⣿⣿⣿⣿⢸⣿⣦⠙⣿⣿⣿⣿⣿⣿⣿⣿⠟\n⡕⡑⣑⣈⣻⢗⢟⢞⢝⣻⣿⣿⣿⣿⣿⣿⣿⠸⣿⠿⠃⣿⣿⣿⣿⣿⣿⡿⠁⣠\n⡝⡵⡈⢟⢕⢕⢕⢕⣵⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣿⣿⣿⣿⣿⠿⠋⣀⣈⠙\n⡝⡵⡕⡀⠑⠳⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠛⢉⡠⡲⡫⡪⡪⡣' + '</span>');
-  writeln('');
-  writeln('<span class="c-accent c-bold">  TUKIST CLI v1.0</span>  <span class="c-dim">— retro terminal interface</span>');
-  writeln('');
-  writeln('  <span class="c-dim">type</span> <span class="c-accent">help</span> <span class="c-dim">to see available commands</span>');
-  writeln('');
+function appendLine(html){
+  var d=el('div','line');d.innerHTML=html;out.appendChild(d);
 }
 
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function newPrompt(){
+  var d=el('div','line');
+  var s=el('span','prompt');s.textContent='tukist@cli:~$ ';
+  var i=el('span');i.setAttribute('contenteditable','true');i.id='inline';
+  var c=el('span','cursor');c.textContent='\u2588';
+  d.appendChild(s);d.appendChild(i);d.appendChild(c);
+  out.appendChild(d);
+  inline=i;
+  inline.focus();
+  out.scrollTop=out.scrollHeight;
+}
+
+function startup(){
+  out.innerHTML='';
+  appendLine(' ╭──────────────────────────────────────────────────────────────────────────────────────────────────╮\n │ ⣇⣿⠘⣿⣿⣿⡿⡿⣟⣟⢟⢟⢝⠵⡝⣿⡿⢂⣼⣿⣷⣌⠩⡫⡻⣝⠹⢿⣿⣷        Welcome to Tukist CLI!                                       │\n │ ⡆⣿⣆⠱⣝⡵⣝⢅⠙⣿⢕⢕⢕⢕⢝⣥⢒⠅⣿⣿⣿⡿⣳⣌⠪⡪⣡⢑⢝⣇        Type help to begin.                                          │\n │ ⡆⣿⣿⣦⠹⣳⣳⣕⢅⠈⢗⢕⢕⢕⢕⢕⢈⢆⠟⠋⠉⠁⠉⠉⠁⠈⠼⢐⢕⢽                                                                     │\n │ ⡗⢰⣶⣶⣦⣝⢝⢕⢕⠅⡆⢕⢕⢕⢕⢕⣴⠏⣠⡶⠛⡉⡉⡛⢶⣦⡀⠐⣕⢕        Directory: ~/                                                │\n │ ⡝⡄⢻⢟⣿⣿⣷⣕⣕⣅⣿⣔⣕⣵⣵⣿⣿⢠⣿⢠⣮⡈⣌⠨⠅⠹⣷⡀⢱⢕        Session:   terminal_01                                       │\n │ ⡝⡵⠟⠈⢀⣀⣀⡀⠉⢿⣿⣿⣿⣿⣿⣿⣿⣼⣿⢈⡋⠴⢿⡟⣡⡇⣿⡇⡀⢕        Model:     Brain v1.0                                        │\n │ ⡝⠁⣠⣾⠟⡉⡉⡉⠻⣦⣻⣿⣿⣿⣿⣿⣿⣿⣿⣧⠸⣿⣦⣥⣿⡇⡿⣰⢗⢄        Version:   0.1.0                                             │\n │ ⠁⢰⣿⡏⣴⣌⠈⣌⠡⠈⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣬⣉⣉⣁⣄⢖⢕⢕⢕        Machine:   DESKTOP-WEB                                       │\n │ ⡀⢻⣿⡇⢙⠁⠴⢿⡟⣡⡆⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣵⣵⣿        CPU:       Browser JavaScript                                │\n │ ⡻⣄⣻⣿⣌⠘⢿⣷⣥⣿⠇⣿⣿⣿⣿⣿⣿⠛⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿        Memory:    Unlimited                                         │\n │ ⣷⢄⠻⣿⣟⠿⠦⠍⠉⣡⣾⣿⣿⣿⣿⣿⣿⢸⣿⣦⠙⣿⣿⣿⣿⣿⣿⣿⣿⠟        Kernel:    WebKit/Blink                                      │\n │ ⡕⡑⣑⣈⣻⢗⢟⢞⢝⣻⣿⣿⣿⣿⣿⣿⣿⠸⣿⠿⠃⣿⣿⣿⣿⣿⣿⡿⠁⣠        Shell:     cli.html                                          │\n │ ⡝⡵⡈⢟⢕⢕⢕⢕⣵⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣿⣿⣿⣿⣿⠿⠋⣀⣈⠙        Node:      N/A (browser)                                     │\n │ ⡝⡵⡕⡀⠑⠳⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠛⢉⡠⡲⡫⡪⡪⡣        MCP:       local only                                        │\n ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯');
+  appendLine('');
+  appendLine('<span class="c-dim">type help to begin</span>');
+  newPrompt();
+}
+
+// ── Commands ──
+var cmds={
+  help:function(){
+    appendLine('<span class="c-acc c-bold">Available commands:</span>');
+    appendLine('  <span class="c-acc">about, whoami</span>  - About Tukist');
+    appendLine('  <span class="c-acc">projects, ls</span>    - List projects');
+    appendLine('  <span class="c-acc">project &lt;n&gt;</span>   - Project details (1-6)');
+    appendLine('  <span class="c-acc">skills</span>          - Skills & tools');
+    appendLine('  <span class="c-acc">contact, links</span>   - Contact & links');
+    appendLine('  <span class="c-acc">game, ski</span>        - ASCII Ski game');
+    appendLine('  <span class="c-acc">neofetch</span>         - System info');
+    appendLine('  <span class="c-acc">clear, cls</span>       - Clear screen');
+    appendLine('  <span class="c-acc">history</span>          - Command history');
+    appendLine('  <span class="c-acc">help</span>             - This help');
+  },
+  about:function(){whoami()},
+  whoami:function(){
+    appendLine('<span class="c-acc c-bold"># whoami</span>');
+    appendLine('  Tukist — developer, builder, learner.');
+    appendLine('  Beihang University (BUAA). Python / TypeScript / ML.');
+    appendLine('  Interests: reverse engineering, web scraping, full-stack, AI security, Japanese.');
+  },
+  projects:function(){ls()},
+  ls:function(){
+    appendLine('<span class="c-acc c-bold">$ ls ~/projects/</span>');
+    appendLine('  <span class="c-acc">1.</span> OpenBUAA          <span class="c-dim">[Vue+Flask]</span>');
+    appendLine('  <span class="c-acc">2.</span> kimi-code-custom  <span class="c-dim">[TS]</span>');
+    appendLine('  <span class="c-acc">3.</span> ai-agent-security <span class="c-dim">[Research]</span>');
+    appendLine('  <span class="c-acc">4.</span> python-exe-unpacker <span class="c-dim">[RE]</span>');
+    appendLine('  <span class="c-acc">5.</span> japanese-learning  <span class="c-dim">[Web]</span>');
+    appendLine('  <span class="c-acc">6.</span> wechat-location    <span class="c-dim">[Proxy]</span>');
+    appendLine('  <span class="c-dim">$ project &lt;1-6&gt; for details</span>');
+  },
+  project:function(args){
+    var ps=[
+      {n:'OpenBUAA',t:'Vue + Flask',d:'BUAA Campus Service Web App. Course schedule, grades, check-in, elective, electricity, room booking.',g:''},
+      {n:'kimi-code-custom',t:'TypeScript',d:'Kimi Code CLI Custom Fork. Custom splash + orange theme + system info panel. MIT.',g:'https://github.com/Tukist/kimi-code-custom'},
+      {n:'ai-agent-security',t:'Jupyter',d:'AI Agent Security Research. Exploring AI coding assistant security boundaries.',g:'https://github.com/Tukist/ai-agent-security'},
+      {n:'Python-exe-unpacker',t:'Python',d:'PyInstaller reverse engineering + TD auto check-in.',g:''},
+      {n:'Japanese Learning Site',t:'HTML/CSS/JS',d:'Refold-method Japanese self-study guide. Single-file HTML.',g:''},
+      {n:'wechat_location_proxy',t:'Python/mitmproxy',d:'WeChat location spoofing proxy.',g:''}
+    ];
+    var i=parseInt(args[0]);
+    if(!i||i<1||i>6){appendLine('<span class="c-err">usage: project &lt;1-6&gt;</span>');return}
+    var p=ps[i-1];
+    appendLine('<span class="c-acc c-bold"># '+p.n+'</span>  <span class="c-dim">['+p.t+']</span>');
+    appendLine('  '+p.d);
+    if(p.g)appendLine('  <span class="c-dim">repo:</span> <span class="c-link" onclick="window.open(''+p.g+'')">'+p.g+'</span>');
+  },
+  skills:function(){
+    appendLine('<span class="c-acc c-bold">$ cat ~/skills.txt</span>');
+    appendLine('  Python [#####.]  TypeScript [####..]  HTML/CSS [####..]  SQL/C/C++ [###...]');
+    appendLine('  Vue3/Vite [####..]  Flask/FastAPI [####..]  PyTorch/sklearn [###...]');
+    appendLine('  Docker [####..]  Git [####..]  mitmproxy [####..]  ReverseEng [###...]');
+  },
+  contact:function(){links()},
+  links:function(){
+    appendLine('<span class="c-acc c-bold">$ cat ~/contact.txt</span>');
+    appendLine('  <span class="c-acc">GitHub:</span>  <span class="c-link" onclick="window.open('https://github.com/Tukist')">github.com/Tukist</span>');
+    appendLine('  <span class="c-acc">Email:</span>   <span class="c-link" onclick="window.open('mailto:2590568618@qq.com')">2590568618@qq.com</span>');
+    appendLine('  <span class="c-acc">QQ:</span>      830058869 (Japanese group)');
+    appendLine('  <span class="c-acc">Location:</span> Beijing, China * BUAA');
+  },
+  game:function(){ski()},
+  ski:function(){
+    appendLine('<span class="c-acc c-bold">$ launching ASCII Ski...</span>');
+    appendLine('  <span class="c-link" onclick="window.open('/','_blank')">opening game -></span>');
+    setTimeout(function(){window.open('/#game','_blank')},200);
+  },
+  neofetch:function(){
+    appendLine('<span class="c-acc">⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣿⣿⣿⣿⣷⢸⣿⣿⡜⢯⣷⡌⡻⣿⣿⣿⣆⢈⠻⠿⢿⣿⣿⣿⣿⣿⣿⣷⣦⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡁⢳⣿⣿⣿⣿⣿⣿⡜⣿⣿⣧⢀⢻⣷⠰⠈⢿⣿⣿⣧⢣⠉⠑⠪⢙⠿⠿⠿⠿⠿⠿⠿⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣱⡇⡞⣿⣿⣿⣿⣿⣿⡇⣿⣿⡏⡄⣧⠹⡇⠧⠈⢻⣿⣿⡇⢧⢢⠀⠀⠑⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣇⢃⢿⣿⣿⣿⣿⣿⣷⣿⣿⠇⢃⣡⣤⡹⠐⣿⣀⢻⣿⣿⢸⡎⠳⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣾⣿⣿⠘⡸⣿⣿⣿⣿⣿⣿⣿⡿⣰⣿⣿⢟⡷⠈⠋⠃⠎⢿⣿⡏⣿⠀⠘⢆⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⡐⢹⣿⣿⡐⢡⢹⣿⣿⣿⣿⡏⣿⢣⣿⣿⡑⠁⠔⠀⠉⠉⠢⡘⣿⡇⣿⡇⠀⡀⠡⡀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠘⣿⣿⣇⠇⢣⢻⣿⣿⣿⡇⢇⣾⣿⣿⡆⢸⣤⡀⠚⢂⠀⢡⢿⡇⣿⡇⠀⢿⠀⠀⠄⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠠⠹⣿⣿⡘⣆⢣⠻⣿⣿⢈⣾⣿⣿⣿⣶⣸⣏⢀⣬⣋⡼⣠⢸⢹⣿⡇⢠⣼⠙⡄⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⡇⠁⠹⣿⣇⠹⡃⠃⠙⡇⠘⢿⣿⣿⣿⣿⣿⣏⣓⣉⣭⣴⣿⠘⢸⣿⠁⠘⠋⠀⠹⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢷⠀⠀⠈⢿⣇⠂⣷⠄⠐⠀⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢠⢸⡏⠀⢀⣠⣴⣾⣿⣶⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢆⠀⠀⠀⠙⠆⠈⠢⠲⠥⣰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡞⣸⠁⠀⢸⣿⣿⣿⣿⣿⣿⡆⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠄⠃⠀⠀⠘⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣿⡏⠹⣿⣿⡿⠫⠊⠀⠀⠀⣶⠀⢻⣿⣿⣿⣿⡿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠛⠻⠿⠿⠿⢋⠀⠀⠀⠀⢀⣼⣿⡆⠈⣿⣿⣿⡟⣱⡷⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢁⣁⡀⠨⣛⠿⠶⠄⢀⣠⣾⣿⣿⣷⠀⢹⣿⡟⣴⠈⢃⣶⠔⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣿⣿⡄⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⡄⠈⣿⣿⡿⠀⡀⣿⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢙⠻⣿⣿⢀⠙⠻⠿⣿⣿⣿⣿⣿⣿⡇⠁⣿⠟⡀⠈⣧⢰⣿⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠿⠴⠮⣥⠻⢧⣤⣄⣀⡉⢩⣭⣍⣃⣀⣩⠎⢀⣼⠉⣼⡯⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⠁⣛⠓⢒⣒⣢⡭⢁⡈⠿⠿⠟⠹⠛⠁⠀⠀⠀⠰⠃⠂⠀⠀⠀</span>');
+    appendLine('<span class="c-acc c-bold">  tukist@terminal</span>');
+    appendLine('  <span class="c-dim">──────────────────</span>');
+    appendLine('  OS: BUAA Linux 2024.1 | Shell: zsh | Uptime: 3 years');
+    appendLine('  Packages: Python, TypeScript, ML | Editor: VS Code');
+    appendLine('  Theme: Green Phosphor CRT');
+  },
+  clear:function(){cls()},
+  cls:function(){out.innerHTML='';newPrompt()},
+  history:function(){
+    appendLine('<span class="c-acc c-bold">$ history</span>');
+    history.forEach(function(h,i){appendLine('  <span class="c-dim">'+String(i+1).padStart(3)+'</span>  '+h)});
+  }
+};
+
 function whoami(){cmds.whoami()}
 
 function exec(input){
-  var args=input.trim().split(/\s+/),c=args[0].toLowerCase();args.shift();
+  var args=input.trim().split(/\s+/),c=(args[0]||'').toLowerCase();args.shift();
   A.enter();
   if(!c)return;
-  if(c==='exit'||c==='quit'){writeln('<span class="c-dim">$ type exit to disconnect</span>');return}
   if(cmds[c]){cmds[c](args)}
-  else{writeln('<span class="c-err">command not found: '+esc(c)+'</span>  <span class="c-dim">type help for available commands</span>');A.err()}
+  else{appendLine('<span class="c-err">command not found: '+c+'</span>');A.err()}
 }
 
-cmd.addEventListener('keydown',function(e){
+// ── Input handling ──
+out.addEventListener('keydown',function(e){
+  if(!inline)return;
   if(e.key==='Enter'){
-    var v=cmd.value.trim();
-    writeln('<span class="c-dim">'+esc(prompt.textContent)+'</span>'+esc(v));
-    history.push(v);histIdx=history.length;exec(v);cmd.value='';
     e.preventDefault();
+    var txt=inline.textContent.trim();
+    // Freeze current line
+    var curLine=inline.parentElement;
+    curLine.removeChild(curLine.querySelector('.cursor'));
+    inline.removeAttribute('contenteditable');
+    inline.id='';
+    curLine.innerHTML='<span class="prompt">tukist@cli:~$ </span>'+txt;
+    history.push(txt);histIdx=history.length;
+    if(txt)exec(txt);
+    newPrompt();
   }else if(e.key==='ArrowUp'){
     e.preventDefault();
-    if(histIdx>0){histIdx--;cmd.value=history[histIdx]}
+    if(histIdx>0){histIdx--;inline.textContent=history[histIdx]}
   }else if(e.key==='ArrowDown'){
     e.preventDefault();
-    if(histIdx<history.length-1){histIdx++;cmd.value=history[histIdx]}
-    else{histIdx=history.length;cmd.value=''}
+    if(histIdx<history.length-1){histIdx++;inline.textContent=history[histIdx]}
+    else{histIdx=history.length;inline.textContent=''}
   }else if(e.key==='Tab'){
     e.preventDefault();
-    var v=cmd.value.toLowerCase(),keys=Object.keys(cmds);
-    for(var i=0;i<keys.length;i++){if(keys[i].startsWith(v)){cmd.value=keys[i];break}}
-  }else{
+    var v=inline.textContent.toLowerCase(),keys=Object.keys(cmds);
+    for(var i=0;i<keys.length;i++){if(keys[i].startsWith(v)){inline.textContent=keys[i];break}}
+  }else if(e.key.length===1||e.key==='Backspace'){
+    // Allow normal typing
     A.tick();
   }
 });
 
-// Click anywhere to focus
-term.addEventListener('click',function(){cmd.focus()});
+// Click to focus
+out.addEventListener('click',function(){
+  if(inline)inline.focus();
+});
 
-// Startup
-banner();
-cmd.focus();
+startup();
 </script>
 </body>
 </html>
