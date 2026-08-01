@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tukist CLI</title>
 <style>
-:root{--bg:#0a0a0a;--fg:#33ff33;--fd:#1a7a1a;--fa:#00ff41}
+:root{--bg:#0d0d0d;--fg:#e8dcc8;--fd:#6b6050;--fa:#FFA726;--fe:#EF5350;--fc:#81C784}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
-body{font-family:'Cascadia Code','Consolas','Courier New',monospace;font-size:14px;color:var(--fg);background:var(--bg);text-shadow:0 0 3px rgba(51,255,51,.3)}
+body{font-family:'Cascadia Code','Consolas','Courier New',monospace;font-size:14px;color:var(--fg);background:var(--bg);text-shadow:0 0 2px rgba(232,220,200,.1)}
 .crt{position:fixed;inset:0;pointer-events:none;z-index:9999}
 .crt::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px)}
 .crt::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.5) 100%);animation:flicker .15s infinite alternate}
@@ -25,7 +25,7 @@ body{font-family:'Cascadia Code','Consolas','Courier New',monospace;font-size:14
 .prompt{color:var(--fa)}
 .cursor{color:var(--fa);animation:blink 1s step-end infinite}
 @keyframes blink{50%{opacity:0}}
-#inline{background:none;border:none;color:var(--fg);font:inherit;outline:none;caret-color:var(--fa);width:60vw;text-shadow:0 0 3px rgba(51,255,51,.3)}
+#inline{background:none;border:none;color:var(--fg);font:inherit;outline:none;caret-color:var(--fa);width:60vw;text-shadow:0 0 2px rgba(232,220,200,.1)}
 .c-err{color:#ff4444}.c-acc{color:var(--fa)}.c-dim{color:var(--fd)}.c-bold{font-weight:700}
 </style>
 </head>
@@ -133,6 +133,53 @@ cmds.cls=function(){out.innerHTML="";newPrompt()};
 cmds.hst=function(){
 appendLine("<span class=c-acc>hst</span>");
 hst.forEach(function(h,i){appendLine("  "+String(i+1).padStart(3)+"  "+h)});
+};
+// Easter eggs
+cmds.matrix=function(){
+appendLine("<span class=c-acc>Wake up, Neo...</span>");
+appendLine("The Matrix has you...");
+setTimeout(function(){appendLine("Follow the white rabbit.")},500);
+setTimeout(function(){appendLine("<span class=c-dim>knock, knock, Neo.</span>")},1000);
+};
+cmds.konami=function(){
+appendLine("<span class=c-acc>\\u2191\\u2191\\u2193\\u2193\\u2190\\u2192\\u2190\\u2192 B A</span>");
+appendLine("<span class=c-dim>You found the secret code!</span>");
+};
+cmds.destiny=function(){
+appendLine("<span class=c-acc>The Road of Destiny awaits...</span>");
+appendLine("A text adventure from another time.");
+appendLine("<span class=c-acc>github.com/Tukist/road-of-destiny</span>");
+};
+cmds.cowsay=function(args){
+var msg=args.join(" ")||"moo";
+var len=msg.length;
+var border=" "+"_".repeat(len+2);
+appendLine(border);
+appendLine("< "+msg+" >");
+appendLine(" "+"-".repeat(len+2));
+appendLine("        \\\\   ^__^");
+appendLine("         \\\\  (oo)\\\\_______");
+appendLine("            (__)\\\\       )\\\\/\\\\");
+appendLine("                ||----w |");
+appendLine("                ||     ||");
+};
+cmds.fortune=function(){
+var fortunes=[
+"The only way to do great work is to love what you do. - Steve Jobs",
+"Simplicity is the ultimate sophistication. - Leonardo da Vinci",
+"First, solve the problem. Then, write the code. - John Johnson",
+"Talk is cheap. Show me the code. - Linus Torvalds",
+"Programs must be written for people to read. - Abelson & Sussman",
+"Any fool can write code that a computer can understand. - Martin Fowler",
+"Testing shows the presence, not the absence of bugs. - Dijkstra",
+"Debugging is twice as hard as writing the code. - Brian Kernighan",
+"Perfection is achieved not when there is nothing more to add. - Saint-Exupery",
+"The best error message is the one that never shows up. - Thomas Fuchs"
+];
+appendLine("<span class=c-acc>fortune:</span> "+fortunes[Math.floor(Math.random()*fortunes.length)]);
+};
+cmds.date=function(){
+appendLine(new Date().toString());
 };
 
 function exec(input){

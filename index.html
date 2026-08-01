@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tukist — Terminal</title>
 <style>
-:root{--bg:#0a0a0a;--fg:#33ff33;--fd:#1a7a1a;--fa:#00ff41;--fe:#ff3333;--fw:#1a1a0a;--ff:'Courier New','IBM Plex Mono','Consolas',monospace;--fs:16px;--mw:960px}
+:root{--bg:#0d0d0d;--fg:#e8dcc8;--fd:#6b6050;--fa:#FFA726;--fe:#EF5350;--fc:#81C784;--ff:'Cascadia Code','Courier New',monospace;--fs:16px;--mw:960px}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{font-size:var(--fs);scroll-behavior:smooth}
-body{font-family:var(--ff);color:var(--fg);background:var(--bg);line-height:1.6;overflow-x:hidden;text-shadow:0 0 4px rgba(51,255,51,.4)}
+body{font-family:var(--ff);color:var(--fg);background:var(--bg);line-height:1.6;overflow-x:hidden;text-shadow:0 0 2px rgba(232,220,200,.15)}
 
 /* ── CRT Overlay ── */
 .crt{position:fixed;inset:0;pointer-events:none;z-index:9999}
@@ -495,6 +495,48 @@ document.addEventListener('keydown',function(e){
 gs.addEventListener('click',function(){if(!alive)startGame()});
 init();draw();gsb.textContent='START';gsb.disabled=false;
 gmsg.textContent='based on yeti -- classic terminal ski';
+})();
+
+// ── Easter Egg: Konami Code ──
+(function(){
+  var k=[38,38,40,40,37,39,37,39,66,65],p=0,m=document.createElement('div');
+  m.style.cssText='position:fixed;inset:0;z-index:9997;pointer-events:none;display:none;font-family:monospace';
+  m.id='matrix-rain';
+  var c=document.createElement('canvas');c.style.cssText='width:100%;height:100%';
+  m.appendChild(c);document.body.appendChild(m);
+  document.addEventListener('keydown',function(e){
+    if(e.keyCode===k[p]){p++;if(p===k.length){p=0;trigger()}}
+    else{p=(e.keyCode===38)?1:0}
+  });
+  function trigger(){
+    m.style.display='block';var ctx=c.getContext('2d');
+    c.width=window.innerWidth;c.height=window.innerHeight;
+    var chars='01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン'.split('');
+    var fs=14,cols=Math.floor(c.width/fs),drops=[];
+    for(var i=0;i<cols;i++)drops[i]=Math.floor(Math.random()*c.height/fs);
+    var iv=setInterval(function(){
+      ctx.fillStyle='rgba(0,0,0,0.05)';ctx.fillRect(0,0,c.width,c.height);
+      ctx.fillStyle='#FFA726';ctx.font=fs+'px monospace';
+      for(var i=0;i<drops.length;i++){
+        ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*fs,drops[i]*fs);
+        if(drops[i]*fs>c.height&&Math.random()>.975)drops[i]=0;drops[i]++;
+      }
+    },40);
+    setTimeout(function(){clearInterval(iv);m.style.display='none'},5000);
+  }
+})();
+
+// ── Easter Egg: Footer click counter ──
+(function(){
+  var clicks=0,el=document.querySelector('.footer-bottom span:first-child');
+  if(!el)return;
+  el.style.cursor='default';
+  el.addEventListener('click',function(){
+    clicks++;
+    var msgs=['built with care','still counting','you found me!','stop clicking','ok fine','(>_<)','destiny awaits','42','keep going!','persistent!','the answer is 42'];
+    el.textContent=clicks<=msgs.length?msgs[clicks-1]:'click #'+clicks;
+    if(clicks>=5)el.style.color='var(--fa)';
+  });
 })();
 </script>
 </body>
