@@ -3,208 +3,175 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tukist — CLI</title>
+<title>Tukist CLI</title>
 <style>
 :root{--bg:#0a0a0a;--fg:#33ff33;--fd:#1a7a1a;--fa:#00ff41}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
 body{font-family:'Cascadia Code','Consolas','Courier New',monospace;font-size:14px;color:var(--fg);background:var(--bg);text-shadow:0 0 3px rgba(51,255,51,.3)}
-
 .crt{position:fixed;inset:0;pointer-events:none;z-index:9999}
 .crt::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px)}
 .crt::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.5) 100%);animation:flicker .15s infinite alternate}
 @keyframes flicker{0%{opacity:.97}100%{opacity:1}}
-
 .noise{position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:.025;mix-blend-mode:overlay}
 .noise::after{content:'';position:absolute;inset:-50%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px 128px;animation:noise .8s steps(4) infinite}
 @keyframes noise{0%,100%{transform:translate(0,0)}25%{transform:translate(-10%,5%)}50%{transform:translate(5%,-10%)}75%{transform:translate(-5%,15%)}}
-
 .term{height:100%;display:flex;flex-direction:column;position:relative;z-index:1}
-#out{flex:1;overflow-y:auto;padding:.8rem 1rem;font-size:.75rem;line-height:1.35;white-space:pre-wrap;word-break:break-all}
+#out{flex:1;overflow-y:auto;padding:.8rem 1rem;font-size:.75rem;line-height:1.35;white-space:pre-wrap}
 #out::-webkit-scrollbar{width:6px}
 #out::-webkit-scrollbar-track{background:var(--bg)}
 #out::-webkit-scrollbar-thumb{background:var(--fd)}
-
 .line{min-height:1.35em}
 .prompt{color:var(--fa)}
 .cursor{color:var(--fa);animation:blink 1s step-end infinite}
 @keyframes blink{50%{opacity:0}}
 #inline{background:none;border:none;color:var(--fg);font:inherit;outline:none;caret-color:var(--fa);width:60vw;text-shadow:0 0 3px rgba(51,255,51,.3)}
-
 .c-err{color:#ff4444}.c-acc{color:var(--fa)}.c-dim{color:var(--fd)}.c-bold{font-weight:700}
-.c-link{color:var(--fa);text-decoration:underline;cursor:pointer}
 </style>
 </head>
 <body>
-
-<div class="crt"></div>
-<div class="noise"></div>
-
-<div class="term">
-  <div id="out"></div>
-</div>
-
+<div class="crt"></div><div class="noise"></div>
+<div class="term"><div id="out"></div></div>
 <script>
-var out=document.getElementById('out'),inline,history=[],histIdx=-1;
+var out=document.getElementById("out"),inline,history=[],histIdx=-1;
 
 var A={ctx:null,init(){try{this.ctx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}},
-  p(f,d,t){if(!this.ctx)this.init();if(!this.ctx)return;var o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=t||'square';o.frequency.value=f;g.gain.setValueAtTime(.03,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,this.ctx.currentTime+d);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+d)},
-  tick(){this.p(800,.025)},enter(){this.p(500,.05)},err(){this.p(150,.2,'sawtooth')}
-};
-document.addEventListener('click',function(){A.init()},{once:true});
+p(f,d,t){if(!this.ctx)this.init();if(!this.ctx)return;var o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=t||"square";o.frequency.value=f;g.gain.setValueAtTime(.03,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,this.ctx.currentTime+d);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+d)},
+tick(){this.p(800,.025)},enter(){this.p(500,.05)},err(){this.p(150,.2,"sawtooth")}};
+document.addEventListener("click",function(){A.init()},{once:true});
 
 function el(t,c){var d=document.createElement(t);if(c)d.className=c;return d}
-function appendLine(html){var d=el('div','line');d.innerHTML=html;out.appendChild(d);}
+function appendLine(h){var d=el("div","line");d.innerHTML=h;out.appendChild(d);}
 
 function newPrompt(){
-  var d=el('div','line');
-  var s=el('span','prompt');s.textContent='tukist@cli:~$ ';
-  var i=document.createElement('input');i.type='text';i.id='inline';i.setAttribute('autocomplete','off');i.setAttribute('spellcheck','false');
-  var c=el('span','cursor');c.textContent='\u2588';
-  d.appendChild(s);d.appendChild(i);d.appendChild(c);
-  out.appendChild(d);inline=i;inline.focus();
-  inline.addEventListener('keydown',handleKey);
-  out.scrollTop=out.scrollHeight;
+var d=el("div","line");
+var s=el("span","prompt");s.textContent="tukist@cli:~$ ";
+var i=document.createElement("input");i.type="text";i.id="inline";i.setAttribute("autocomplete","off");i.setAttribute("spellcheck","false");
+var c=el("span","cursor");c.textContent="\u2588";
+d.appendChild(s);d.appendChild(i);d.appendChild(c);
+out.appendChild(d);inline=i;inline.focus();
+inline.addEventListener("keydown",handleKey);
+out.scrollTop=out.scrollHeight;
 }
+
+var startupBox=[
+'╭──────────────────────────────────────────────────────────────────────────────────────────────────╮',
+'│ ⣇⣿⠘⣿⣿⣿⡿⡿⣟⣟⢟⢟⢝⠵⡝⣿⡿⢂⣼⣿⣷⣌⠩⡫⡻⣝⠹⢿⣿⣷        Welcome to Tukist CLI!                                     │',
+'│ ⡆⣿⣆⠱⣝⡵⣝⢅⠙⣿⢕⢕⢕⢕⢝⣥⢒⠅⣿⣿⣿⡿⣳⣌⠪⡪⣡⢑⢝⣇        Type help to begin.                                        │',
+'│ ⡆⣿⣿⣦⠹⣳⣳⣕⢅⠈⢗⢕⢕⢕⢕⢕⢈⢆⠟⠋⠉⠁⠉⠉⠁⠈⠼⢐⢕⢽                                                                   │',
+'│ ⡗⢰⣶⣶⣦⣝⢝⢕⢕⠅⡆⢕⢕⢕⢕⢕⣴⠏⣠⡶⠛⡉⡉⡛⢶⣦⡀⠐⣕⢕        Directory: ~/                                              │',
+'│ ⡝⡄⢻⢟⣿⣿⣷⣕⣕⣅⣿⣔⣕⣵⣵⣿⣿⢠⣿⢠⣮⡈⣌⠨⠅⠹⣷⡀⢱⢕        Session:   terminal_01                                     │',
+'│ ⡝⡵⠟⠈⢀⣀⣀⡀⠉⢿⣿⣿⣿⣿⣿⣿⣿⣼⣿⢈⡋⠴⢿⡟⣡⡇⣿⡇⡀⢕        Model:     Brain v1.0                                      │',
+'│ ⡝⠁⣠⣾⠟⡉⡉⡉⠻⣦⣻⣿⣿⣿⣿⣿⣿⣿⣿⣧⠸⣿⣦⣥⣿⡇⡿⣰⢗⢄        Version:   0.1.0                                           │',
+'│ ⠁⢰⣿⡏⣴⣌⠈⣌⠡⠈⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣬⣉⣉⣁⣄⢖⢕⢕⢕        Machine:   DESKTOP-WEB                                     │',
+'│ ⡀⢻⣿⡇⢙⠁⠴⢿⡟⣡⡆⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣵⣵⣿        CPU:       Browser JavaScript                              │',
+'│ ⡻⣄⣻⣿⣌⠘⢿⣷⣥⣿⠇⣿⣿⣿⣿⣿⣿⠛⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿        Memory:    Unlimited                                       │',
+'│ ⣷⢄⠻⣿⣟⠿⠦⠍⠉⣡⣾⣿⣿⣿⣿⣿⣿⢸⣿⣦⠙⣿⣿⣿⣿⣿⣿⣿⣿⠟        Kernel:    WebKit/Blink                                    │',
+'│ ⡕⡑⣑⣈⣻⢗⢟⢞⢝⣻⣿⣿⣿⣿⣿⣿⣿⠸⣿⠿⠃⣿⣿⣿⣿⣿⣿⡿⠁⣠        Shell:     cli.html                                        │',
+'│ ⡝⡵⡈⢟⢕⢕⢕⢕⣵⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣿⣿⣿⣿⣿⠿⠋⣀⣈⠙        Node:      N/A (browser)                                   │',
+'│ ⡝⡵⡕⡀⠑⠳⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠛⢉⡠⡲⡫⡪⡪⡣        MCP:       local only                                      │',
+'╰──────────────────────────────────────────────────────────────────────────────────────────────────╯'
+];
 
 function startup(){
-  out.innerHTML="";
-  appendLine("╭──────────────────────────────────────────────────────────────────────────────────────────────────╮");
-  appendLine("│ ⣇⣿⠘⣿⣿⣿⡿⡿⣟⣟⢟⢟⢝⠵⡝⣿⡿⢂⣼⣿⣷⣌⠩⡫⡻⣝⠹⢿⣿⣷        Welcome to Tukist CLI!                                     │");
-  appendLine("│ ⡆⣿⣆⠱⣝⡵⣝⢅⠙⣿⢕⢕⢕⢕⢝⣥⢒⠅⣿⣿⣿⡿⣳⣌⠪⡪⣡⢑⢝⣇        Type help to begin.                                        │");
-  appendLine("│ ⡆⣿⣿⣦⠹⣳⣳⣕⢅⠈⢗⢕⢕⢕⢕⢕⢈⢆⠟⠋⠉⠁⠉⠉⠁⠈⠼⢐⢕⢽                                                                   │");
-  appendLine("│ ⡗⢰⣶⣶⣦⣝⢝⢕⢕⠅⡆⢕⢕⢕⢕⢕⣴⠏⣠⡶⠛⡉⡉⡛⢶⣦⡀⠐⣕⢕        Directory: ~/                                              │");
-  appendLine("│ ⡝⡄⢻⢟⣿⣿⣷⣕⣕⣅⣿⣔⣕⣵⣵⣿⣿⢠⣿⢠⣮⡈⣌⠨⠅⠹⣷⡀⢱⢕        Session:   terminal_01                                     │");
-  appendLine("│ ⡝⡵⠟⠈⢀⣀⣀⡀⠉⢿⣿⣿⣿⣿⣿⣿⣿⣼⣿⢈⡋⠴⢿⡟⣡⡇⣿⡇⡀⢕        Model:     Brain v1.0                                      │");
-  appendLine("│ ⡝⠁⣠⣾⠟⡉⡉⡉⠻⣦⣻⣿⣿⣿⣿⣿⣿⣿⣿⣧⠸⣿⣦⣥⣿⡇⡿⣰⢗⢄        Version:   0.1.0                                           │");
-  appendLine("│ ⠁⢰⣿⡏⣴⣌⠈⣌⠡⠈⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣬⣉⣉⣁⣄⢖⢕⢕⢕        Machine:   DESKTOP-WEB                                     │");
-  appendLine("│ ⡀⢻⣿⡇⢙⠁⠴⢿⡟⣡⡆⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣵⣵⣿        CPU:       Browser JavaScript                              │");
-  appendLine("│ ⡻⣄⣻⣿⣌⠘⢿⣷⣥⣿⠇⣿⣿⣿⣿⣿⣿⠛⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿        Memory:    Unlimited                                       │");
-  appendLine("│ ⣷⢄⠻⣿⣟⠿⠦⠍⠉⣡⣾⣿⣿⣿⣿⣿⣿⢸⣿⣦⠙⣿⣿⣿⣿⣿⣿⣿⣿⠟        Kernel:    WebKit/Blink                                    │");
-  appendLine("│ ⡕⡑⣑⣈⣻⢗⢟⢞⢝⣻⣿⣿⣿⣿⣿⣿⣿⠸⣿⠿⠃⣿⣿⣿⣿⣿⣿⡿⠁⣠        Shell:     cli.html                                        │");
-  appendLine("│ ⡝⡵⡈⢟⢕⢕⢕⢕⣵⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣿⣿⣿⣿⣿⠿⠋⣀⣈⠙        Node:      N/A (browser)                                   │");
-  appendLine("│ ⡝⡵⡕⡀⠑⠳⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠛⢉⡠⡲⡫⡪⡪⡣        MCP:       local only                                      │");
-  appendLine("╰──────────────────────────────────────────────────────────────────────────────────────────────────╯");
-  appendLine("");
-  appendLine("<span class=c-dim>type help to begin</span>");
-  newPrompt();
+out.innerHTML="";
+startupBox.forEach(function(line){appendLine(line)});
+appendLine("");
+appendLine("<span class=c-dim>type help to begin</span>");
+newPrompt();
 }
 
-
-var cmds={
-  help:function(){
-    appendLine('<span class="c-acc c-bold">Available commands:</span>');
-    appendLine('  <span class="c-acc">about, whoami</span>  - About Tukist');
-    appendLine('  <span class="c-acc">projects, ls</span>    - List projects');
-    appendLine('  <span class="c-acc">project &lt;n&gt;</span>   - Project details (1-6)');
-    appendLine('  <span class="c-acc">skills</span>          - Skills & tools');
-    appendLine('  <span class="c-acc">contact, links</span>   - Contact & links');
-    appendLine('  <span class="c-acc">game, ski</span>        - ASCII Ski game');
-    appendLine('  <span class="c-acc">neofetch</span>         - System info');
-    appendLine('  <span class="c-acc">clear, cls</span>       - Clear screen');
-    appendLine('  <span class="c-acc">history</span>          - Command history');
-    appendLine('  <span class="c-acc">help</span>             - This help');
-  },
-  about:function(){cmds.whoami()},
-  whoami:function(){
-    appendLine('<span class="c-acc c-bold"># whoami</span>');
-    appendLine('  Tukist — developer, builder, learner.');
-    appendLine('  Beihang University (BUAA). Python / TypeScript / ML.');
-    appendLine('  Interests: reverse engineering, web scraping, full-stack, AI security, Japanese.');
-  },
-  projects:function(){cmds.ls()},
-  ls:function(){
-    appendLine('<span class="c-acc c-bold">$ ls ~/projects/</span>');
-    appendLine('  <span class="c-acc">1.</span> OpenBUAA          <span class="c-dim">[Vue+Flask]</span>');
-    appendLine('  <span class="c-acc">2.</span> kimi-code-custom  <span class="c-dim">[TS]</span>');
-    appendLine('  <span class="c-acc">3.</span> ai-agent-security <span class="c-dim">[Research]</span>');
-    appendLine('  <span class="c-acc">4.</span> python-exe-unpacker <span class="c-dim">[RE]</span>');
-    appendLine('  <span class="c-acc">5.</span> japanese-learning  <span class="c-dim">[Web]</span>');
-    appendLine('  <span class="c-acc">6.</span> wechat-location    <span class="c-dim">[Proxy]</span>');
-    appendLine('  <span class="c-dim">$ project &lt;1-6&gt; for details</span>');
-  },
-  project:function(args){
-    var ps=[
-      {n:'OpenBUAA',t:'Vue + Flask',d:'BUAA Campus Service Web App. Course schedule, grades, check-in, elective, electricity, room booking.',g:''},
-      {n:'kimi-code-custom',t:'TypeScript',d:'Kimi Code CLI Custom Fork. Custom splash + orange theme + system info panel. MIT.',g:'https://github.com/Tukist/kimi-code-custom'},
-      {n:'ai-agent-security',t:'Jupyter',d:'AI Agent Security Research. Exploring AI coding assistant security boundaries.',g:'https://github.com/Tukist/ai-agent-security'},
-      {n:'Python-exe-unpacker',t:'Python',d:'PyInstaller reverse engineering + TD auto check-in.',g:''},
-      {n:'Japanese Learning Site',t:'HTML/CSS/JS',d:'Refold-method Japanese self-study guide. Single-file HTML.',g:''},
-      {n:'wechat_location_proxy',t:'Python/mitmproxy',d:'WeChat location spoofing proxy.',g:''}
-    ];
-    var i=parseInt(args[0]);
-    if(!i||i<1||i>6){appendLine('<span class="c-err">usage: project &lt;1-6&gt;</span>');return}
-    var p=ps[i-1];
-    appendLine('<span class="c-acc c-bold"># '+p.n+'</span>  <span class="c-dim">['+p.t+']</span>');
-    appendLine('  '+p.d);
-    if(p.g)appendLine('  <span class="c-dim">repo:</span> <span class="c-link" onclick="window.open(\''+p.g+'\')">'+p.g+'</span>');
-  },
-  skills:function(){
-    appendLine('<span class="c-acc c-bold">$ cat ~/skills.txt</span>');
-    appendLine('  Python [#####.]  TypeScript [####..]  HTML/CSS [####..]  SQL/C/C++ [###...]');
-    appendLine('  Vue3/Vite [####..]  Flask/FastAPI [####..]  PyTorch/sklearn [###...]');
-    appendLine('  Docker [####..]  Git [####..]  mitmproxy [####..]  ReverseEng [###...]');
-  },
-  contact:function(){cmds.links()},
-  links:function(){
-    appendLine('<span class="c-acc c-bold">$ cat ~/contact.txt</span>');
-    appendLine('  <span class="c-acc">GitHub:</span>  <span class="c-link" onclick="window.open(\'https://github.com/Tukist\')">github.com/Tukist</span>');
-    appendLine('  <span class="c-acc">Email:</span>   <span class="c-link" onclick="window.open(\'mailto:2590568618@qq.com\')">2590568618@qq.com</span>');
-    appendLine('  <span class="c-acc">QQ:</span>      830058869 (Japanese group)');
-    appendLine('  <span class="c-acc">Location:</span> Beijing, China * BUAA');
-  },
-  game:function(){cmds.ski()},
-  ski:function(){
-    appendLine('<span class="c-acc c-bold">$ launching ASCII Ski...</span>');
-    appendLine('  <span class="c-link" onclick="window.open(\'/\',\'_blank\')">opening game -></span>');
-    setTimeout(function(){window.open('/#game','_blank')},200);
-  },
-  clear:function(){cmds.cls()},
-  cls:function(){out.innerHTML='';newPrompt()},
-  history:function(){
-    appendLine('<span class="c-acc c-bold">$ history</span>');
-    history.forEach(function(h,i){appendLine('  <span class="c-dim">'+String(i+1).padStart(3)+'</span>  '+h)});
-  }
+var cmds={};
+cmds.help=function(){
+appendLine("<span class=c-acc>Available commands:</span>");
+appendLine("  about, whoami   - About Tukist");
+appendLine("  projects, ls    - List projects");
+appendLine("  project <n>     - Project details");
+appendLine("  skills          - Skills");
+appendLine("  contact, links  - Contact info");
+appendLine("  game, ski       - ASCII Ski game");
+appendLine("  clear, cls      - Clear screen");
+appendLine("  history         - Command history");
+};
+cmds.about=function(){cmds.whoami()};
+cmds.whoami=function(){
+appendLine("<span class=c-acc># whoami</span>");
+appendLine("  Tukist - developer, builder, learner.");
+appendLine("  Beihang University (BUAA). Python / TypeScript / ML.");
+};
+cmds.projects=function(){cmds.ls()};
+cmds.ls=function(){
+appendLine("<span class=c-acc>ls projects/</span>");
+appendLine("  1. OpenBUAA          [Vue+Flask]  2. kimi-code-custom  [TS]");
+appendLine("  3. ai-agent-security [Research]   4. python-exe-unpacker [RE]");
+appendLine("  5. japanese-learning [Web]        6. wechat-location   [Proxy]");
+};
+cmds.project=function(args){
+var ps=[{n:"OpenBUAA",d:"BUAA Campus Service. Vue 3 + Vite + Tailwind + Pinia.",g:""},{n:"kimi-code-custom",d:"Kimi Code CLI Custom Fork. MIT.",g:"https://github.com/Tukist/kimi-code-custom"},{n:"ai-agent-security",d:"AI Agent Security Research.",g:"https://github.com/Tukist/ai-agent-security"},{n:"Python-exe-unpacker",d:"PyInstaller RE + TD check-in.",g:""},{n:"Japanese Learning Site",d:"Single-file HTML. Refold method.",g:""},{n:"wechat_location_proxy",d:"mitmproxy location spoofing.",g:""}];
+var i=parseInt(args[0]);
+if(!i||i<1||i>6){appendLine("<span class=c-err>usage: project 1-6</span>");return}
+var p=ps[i-1];
+appendLine("# "+p.n);
+appendLine("  "+p.d);
+if(p.g)appendLine("  repo: "+p.g);
+};
+cmds.skills=function(){
+appendLine("Python [#####.]  TS [####..]  HTML/CSS [####..]  SQL/C [###...]");
+appendLine("Vue/Vite [####..]  Flask [####..]  PyTorch [###...]");
+appendLine("Docker [####..]  Git [####..]  mitmproxy [####..]  RE [###...]");
+};
+cmds.contact=function(){cmds.links()};
+cmds.links=function(){
+appendLine("GitHub: github.com/Tukist   Email: 2590568618@qq.com");
+appendLine("QQ: 830058869   Location: Beijing, China * BUAA");
+};
+cmds.game=function(){cmds.ski()};
+cmds.ski=function(){
+appendLine("launching ASCII Ski on main page...");
+setTimeout(function(){window.open("/#game","_blank")},200);
+};
+cmds.clear=function(){cmds.cls()};
+cmds.cls=function(){out.innerHTML="";newPrompt()};
+cmds.history=function(){
+appendLine("<span class=c-acc>history</span>");
+history.forEach(function(h,i){appendLine("  "+String(i+1).padStart(3)+"  "+h)});
 };
 
 function exec(input){
-  var args=input.trim().split(/\s+/),c=(args[0]||'').toLowerCase();args.shift();
-  A.enter();
-  if(!c)return;
-  if(cmds[c]){cmds[c](args)}
-  else{appendLine('<span class="c-err">command not found: '+c+'</span>');A.err()}
+var args=input.trim().split(/\s+/),c=(args[0]||"").toLowerCase();args.shift();
+A.enter();
+if(!c)return;
+if(cmds[c]){cmds[c](args)}
+else{appendLine("<span class=c-err>command not found: "+c+"</span>");A.err()}
 }
 
 function handleKey(e){
-  if(e.key==='Enter'){
-    e.preventDefault();
-    var txt=inline.value.trim();
-    var curLine=inline.parentElement;
-    curLine.removeChild(curLine.querySelector('.cursor'));
-    inline.removeEventListener('keydown',handleKey);
-    curLine.removeChild(inline);
-    curLine.innerHTML+='<span>'+txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</span>';
-    history.push(txt);histIdx=history.length;
-    if(txt)exec(txt);
-    newPrompt();
-  }else if(e.key==='ArrowUp'){
-    e.preventDefault();
-    if(histIdx>0){histIdx--;inline.value=history[histIdx]}
-  }else if(e.key==='ArrowDown'){
-    e.preventDefault();
-    if(histIdx<history.length-1){histIdx++;inline.value=history[histIdx]}
-    else{histIdx=history.length;inline.value=''}
-  }else if(e.key==='Tab'){
-    e.preventDefault();
-    var v=inline.value.toLowerCase(),keys=Object.keys(cmds);
-    for(var i=0;i<keys.length;i++){if(keys[i].startsWith(v)){inline.value=keys[i];break}}
-  }else if(e.key.length===1||e.key==='Backspace'){
-    A.tick();
-  }
+if(e.key==="Enter"){
+e.preventDefault();
+var txt=inline.value.trim();
+var curLine=inline.parentElement;
+curLine.removeChild(curLine.querySelector(".cursor"));
+inline.removeEventListener("keydown",handleKey);
+curLine.removeChild(inline);
+curLine.innerHTML+="<span>"+txt.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</span>";
+history.push(txt);histIdx=history.length;
+if(txt)exec(txt);
+newPrompt();
+}else if(e.key==="ArrowUp"){
+e.preventDefault();
+if(histIdx>0){histIdx--;inline.value=history[histIdx]}
+}else if(e.key==="ArrowDown"){
+e.preventDefault();
+if(histIdx<history.length-1){histIdx++;inline.value=history[histIdx]}
+else{histIdx=history.length;inline.value=""}
+}else if(e.key==="Tab"){
+e.preventDefault();
+var v=inline.value.toLowerCase(),keys=Object.keys(cmds);
+for(var i=0;i<keys.length;i++){if(keys[i].startsWith(v)){inline.value=keys[i];break}}
+}else if(e.key.length===1||e.key==="Backspace"){A.tick();}
 }
 
-out.addEventListener('click',function(){if(inline)inline.focus();});
-
+out.addEventListener("click",function(){if(inline)inline.focus();});
 startup();
 </script>
 </body>
