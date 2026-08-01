@@ -85,7 +85,7 @@ h2::before{content:'# ';color:var(--fd)}
 /* ── Braille Art ── */
 .br-art{font-family:var(--ff);letter-spacing:0;user-select:none;white-space:pre}
 .br-art-about{font-size:.7rem;line-height:1.44;color:var(--fd);opacity:.7}
-.br-art-avatar{font-size:.82rem;line-height:1.44;letter-spacing:-0.17em;color:var(--fa);text-shadow:0 0 6px rgba(255,167,38,.3)}
+.br-art-avatar{font-size:.82rem;line-height:1;letter-spacing:-0.13em;color:var(--fa);text-shadow:0 0 6px rgba(255,167,38,.3)}
 .br-art-contact{font-size:.58rem;line-height:1.44;color:var(--fd);opacity:.6}
 .br-art-footer{font-size:.55rem;line-height:1.44;color:var(--fd);opacity:.5}
 .br-sep{text-align:center;margin:3rem 0 2rem;font-size:.65rem;font-family:var(--ff);color:var(--fd);user-select:none;overflow:hidden}
@@ -138,18 +138,15 @@ h2::before{content:'# ';color:var(--fd)}
   .nav-links.open{display:flex}.nav-toggle{display:block}
 }
 
-/* ── Glitch Art ── */
-.glitch-wrap{position:relative;overflow:hidden;padding:2rem 0;text-align:center}
-.glitch-art{font-family:var(--ff);font-size:.42rem;line-height:1.1;white-space:pre;display:inline-block;color:var(--fg);text-shadow:0 0 2px var(--fg);position:relative;animation:glitch-skew 4s steps(3) infinite}
+.glitch-wrap{position:relative;overflow:hidden;padding:1rem 0;text-align:center}
+.glitch-art{font-family:var(--ff);font-size:.42rem;line-height:1.1;white-space:pre;display:inline-block;color:var(--fg);position:relative;animation:gj 4s steps(3) infinite}
 .glitch-art::before,.glitch-art::after{content:attr(data-text);position:absolute;left:0;top:0;width:100%;height:100%;white-space:pre;font:inherit;line-height:inherit}
-.glitch-art::before{color:#f0f;animation:glitch-before 3s steps(2) infinite;clip-path:inset(0 0 60% 0);opacity:.8;z-index:1}
-.glitch-art::after{color:#0ff;animation:glitch-after 2.5s steps(3) infinite;clip-path:inset(40% 0 30% 0);opacity:.8;z-index:1}
-@keyframes glitch-skew{0%,90%,100%{transform:translate(0)}10%{transform:translate(-3px,1px)}20%{transform:translate(2px,-1px)}30%{transform:translate(-1px,2px)}85%{transform:translate(3px,0)}}
-@keyframes glitch-before{0%,80%,100%{transform:translate(0)}15%{transform:translate(-5px,0)}25%{transform:translate(4px,0)}60%{transform:translate(-2px,0)}}
-@keyframes glitch-after{0%,70%,100%{transform:translate(0)}10%{transform:translate(6px,0)}30%{transform:translate(-3px,0)}50%{transform:translate(2px,0)}}
+.glitch-art::before{color:#f0f;animation:g1 3s steps(2) infinite;opacity:.35}
+.glitch-art::after{color:#0ff;animation:g2 2.5s steps(3) infinite;opacity:.35}
+@keyframes gj{0%,90%,100%{transform:translate(0)}10%{transform:translate(-2px,1px)}20%{transform:translate(1.5px,-.5px)}30%{transform:translate(-1px,1.5px)}85%{transform:translate(2px,0)}}
+@keyframes g1{0%,80%,100%{transform:translate(0)}15%{transform:translate(-10px,0)}25%{transform:translate(8px,0)}60%{transform:translate(-4px,0)}}
+@keyframes g2{0%,70%,100%{transform:translate(0)}10%{transform:translate(12px,0)}30%{transform:translate(-6px,0)}50%{transform:translate(4px,0)}}
 .glitch-scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,167,38,.03) 3px,rgba(255,167,38,.03) 6px);z-index:2}
-.glitch-flicker{animation:glitch-opacity .15s steps(2) infinite}
-@keyframes glitch-opacity{0%{opacity:1}50%{opacity:.85}100%{opacity:.95}}
 
 </style>
 </head>
@@ -167,6 +164,7 @@ h2::before{content:'# ';color:var(--fd)}
     <a href="#skills">skills</a>
     <a href="#game">game</a>
     <a href="#contact">contact</a>
+    <a href="#art">art</a>
     <a href="cli.html" style="color:var(--fa)">[cli]</a>
   </div>
 </div></nav>
@@ -315,7 +313,7 @@ h2::before{content:'# ';color:var(--fd)}
       <ul class="ll">
         <li><span class="lb">$</span><a href="https://github.com/Tukist" target="_blank">github.com/Tukist</a><span class="ar">&rarr;</span></li>
         <li><span class="lb">$</span><a href="mailto:2590568618@qq.com">2590568618@qq.com</a><span class="ar">&rarr;</span></li>
-        <li><span class="lb">$</span><span>QQ: 830058869 (Japanese)</span></li>
+        <li><span class="lb">$</span><span>QQ: 2590568618 (Main)</span></li>
         <li><span class="lb">$</span><span>Location: Beijing, CN</span></li>
         <li><span class="lb">$</span><span>BUAA</span></li>
       </ul>
@@ -354,13 +352,12 @@ h2::before{content:'# ';color:var(--fd)}
 
 <div class="container"><div class="br-sep">/* --------------------------------- */</div></div>
 
-<section style="padding:1rem 0 3rem">
-  <div class="container" style="text-align:center">
-    <span class="stag">glitch</span>
-    <h2 style="margin-bottom:1.5rem">signal_noise</h2>
-    <div class="glitch-wrap glitch-flicker">
-      <div class="glitch-scan"></div>
-      <pre class="glitch-art" data-text="⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣤⣤⣤⣤⠤⠤⠤⣤⣤⣤⣤⣤⣄⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+<section class="section" id="art" style="padding-top:0"><div class="container">
+  <span class="stag">art</span>
+  <h2>signal_noise</h2>
+  <div class="glitch-wrap">
+    <div class="glitch-scan"></div>
+    <pre class="glitch-art" data-text="⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣤⣤⣤⣤⠤⠤⠤⣤⣤⣤⣤⣤⣄⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣴⠶⡟⠛⠋⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠛⠻⣶⣤⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣾⠛⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢯⣻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣾⡟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -437,9 +434,8 @@ h2::before{content:'# ';color:var(--fd)}
 ⠀⠀⠀⠀⠀⠀⠀⠹⡇⠀⢹⡆⠀⠀⠀⣀⣤⡶⠟⢽⠏⠁⢸⣿⡷⠙⣿⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣧⠄⠀⠀⠀⠀⠉⠉⠉⠉⠉⠉⠉⠉⠉⠀⣽⠇⠀⠀⢻⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢿⣆⠀
 ⠀⠀⠀⠀⠀⠀⠀⣾⣿⠀⣈⣡⡤⡶⣟⢉⡀⠀⠀⠀⢠⣺⡾⠋⠀⢀⣿⣞⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣧⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⡟⠀⠀⠀⠸⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⡿⢿⣆
 ⠀⠀⠀⠀⠀⠀⠀⠿⠿⠿⠭⠥⠤⠤⠭⠤⠤⠤⠤⠷⠿⠭⠤⠤⠴⠯⠤⠿⠬⠷⠤⠤⠤⠄⠀⠀⠀⠠⠤⠤⠤⠤⠽⠿⠷⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠿⠥⠤⠤⠤⠤⠤⠤⠤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠤⠤⠤⠤⠼⠯⠤⠼⡧</pre>
-    </div>
   </div>
-</section>
+</div></section>
 
 
 <footer class="footer"><div class="container">
