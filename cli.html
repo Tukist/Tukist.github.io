@@ -74,115 +74,27 @@ function newPrompt(){
 }
 
 function startup(){
-  out.innerHTML='';
-  appendLine(' ╭──────────────────────────────────────────────────────────────────────────────────────────────────╮\n │ ⣇⣿⠘⣿⣿⣿⡿⡿⣟⣟⢟⢟⢝⠵⡝⣿⡿⢂⣼⣿⣷⣌⠩⡫⡻⣝⠹⢿⣿⣷        Welcome to Tukist CLI!                                       │\n │ ⡆⣿⣆⠱⣝⡵⣝⢅⠙⣿⢕⢕⢕⢕⢝⣥⢒⠅⣿⣿⣿⡿⣳⣌⠪⡪⣡⢑⢝⣇        Type help to begin.                                          │\n │ ⡆⣿⣿⣦⠹⣳⣳⣕⢅⠈⢗⢕⢕⢕⢕⢕⢈⢆⠟⠋⠉⠁⠉⠉⠁⠈⠼⢐⢕⢽                                                                     │\n │ ⡗⢰⣶⣶⣦⣝⢝⢕⢕⠅⡆⢕⢕⢕⢕⢕⣴⠏⣠⡶⠛⡉⡉⡛⢶⣦⡀⠐⣕⢕        Directory: ~/                                                │\n │ ⡝⡄⢻⢟⣿⣿⣷⣕⣕⣅⣿⣔⣕⣵⣵⣿⣿⢠⣿⢠⣮⡈⣌⠨⠅⠹⣷⡀⢱⢕        Session:   terminal_01                                       │\n │ ⡝⡵⠟⠈⢀⣀⣀⡀⠉⢿⣿⣿⣿⣿⣿⣿⣿⣼⣿⢈⡋⠴⢿⡟⣡⡇⣿⡇⡀⢕        Model:     Brain v1.0                                        │\n │ ⡝⠁⣠⣾⠟⡉⡉⡉⠻⣦⣻⣿⣿⣿⣿⣿⣿⣿⣿⣧⠸⣿⣦⣥⣿⡇⡿⣰⢗⢄        Version:   0.1.0                                             │\n │ ⠁⢰⣿⡏⣴⣌⠈⣌⠡⠈⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣬⣉⣉⣁⣄⢖⢕⢕⢕        Machine:   DESKTOP-WEB                                       │\n │ ⡀⢻⣿⡇⢙⠁⠴⢿⡟⣡⡆⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣵⣵⣿        CPU:       Browser JavaScript                                │\n │ ⡻⣄⣻⣿⣌⠘⢿⣷⣥⣿⠇⣿⣿⣿⣿⣿⣿⠛⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿        Memory:    Unlimited                                         │\n │ ⣷⢄⠻⣿⣟⠿⠦⠍⠉⣡⣾⣿⣿⣿⣿⣿⣿⢸⣿⣦⠙⣿⣿⣿⣿⣿⣿⣿⣿⠟        Kernel:    WebKit/Blink                                      │\n │ ⡕⡑⣑⣈⣻⢗⢟⢞⢝⣻⣿⣿⣿⣿⣿⣿⣿⠸⣿⠿⠃⣿⣿⣿⣿⣿⣿⡿⠁⣠        Shell:     cli.html                                          │\n │ ⡝⡵⡈⢟⢕⢕⢕⢕⣵⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣿⣿⣿⣿⣿⠿⠋⣀⣈⠙        Node:      N/A (browser)                                     │\n │ ⡝⡵⡕⡀⠑⠳⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠛⢉⡠⡲⡫⡪⡪⡣        MCP:       local only                                        │\n ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯');
-  appendLine('');
-  appendLine('<span class="c-dim">type help to begin</span>');
+  out.innerHTML="";
+  appendLine("╭──────────────────────────────────────────────────────────────────────────────────────────────────╮");
+  appendLine("│ ⣇⣿⠘⣿⣿⣿⡿⡿⣟⣟⢟⢟⢝⠵⡝⣿⡿⢂⣼⣿⣷⣌⠩⡫⡻⣝⠹⢿⣿⣷        Welcome to Tukist CLI!                                     │");
+  appendLine("│ ⡆⣿⣆⠱⣝⡵⣝⢅⠙⣿⢕⢕⢕⢕⢝⣥⢒⠅⣿⣿⣿⡿⣳⣌⠪⡪⣡⢑⢝⣇        Type help to begin.                                        │");
+  appendLine("│ ⡆⣿⣿⣦⠹⣳⣳⣕⢅⠈⢗⢕⢕⢕⢕⢕⢈⢆⠟⠋⠉⠁⠉⠉⠁⠈⠼⢐⢕⢽                                                                   │");
+  appendLine("│ ⡗⢰⣶⣶⣦⣝⢝⢕⢕⠅⡆⢕⢕⢕⢕⢕⣴⠏⣠⡶⠛⡉⡉⡛⢶⣦⡀⠐⣕⢕        Directory: ~/                                              │");
+  appendLine("│ ⡝⡄⢻⢟⣿⣿⣷⣕⣕⣅⣿⣔⣕⣵⣵⣿⣿⢠⣿⢠⣮⡈⣌⠨⠅⠹⣷⡀⢱⢕        Session:   terminal_01                                     │");
+  appendLine("│ ⡝⡵⠟⠈⢀⣀⣀⡀⠉⢿⣿⣿⣿⣿⣿⣿⣿⣼⣿⢈⡋⠴⢿⡟⣡⡇⣿⡇⡀⢕        Model:     Brain v1.0                                      │");
+  appendLine("│ ⡝⠁⣠⣾⠟⡉⡉⡉⠻⣦⣻⣿⣿⣿⣿⣿⣿⣿⣿⣧⠸⣿⣦⣥⣿⡇⡿⣰⢗⢄        Version:   0.1.0                                           │");
+  appendLine("│ ⠁⢰⣿⡏⣴⣌⠈⣌⠡⠈⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣬⣉⣉⣁⣄⢖⢕⢕⢕        Machine:   DESKTOP-WEB                                     │");
+  appendLine("│ ⡀⢻⣿⡇⢙⠁⠴⢿⡟⣡⡆⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣵⣵⣿        CPU:       Browser JavaScript                              │");
+  appendLine("│ ⡻⣄⣻⣿⣌⠘⢿⣷⣥⣿⠇⣿⣿⣿⣿⣿⣿⠛⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿        Memory:    Unlimited                                       │");
+  appendLine("│ ⣷⢄⠻⣿⣟⠿⠦⠍⠉⣡⣾⣿⣿⣿⣿⣿⣿⢸⣿⣦⠙⣿⣿⣿⣿⣿⣿⣿⣿⠟        Kernel:    WebKit/Blink                                    │");
+  appendLine("│ ⡕⡑⣑⣈⣻⢗⢟⢞⢝⣻⣿⣿⣿⣿⣿⣿⣿⠸⣿⠿⠃⣿⣿⣿⣿⣿⣿⡿⠁⣠        Shell:     cli.html                                        │");
+  appendLine("│ ⡝⡵⡈⢟⢕⢕⢕⢕⣵⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣿⣿⣿⣿⣿⠿⠋⣀⣈⠙        Node:      N/A (browser)                                   │");
+  appendLine("│ ⡝⡵⡕⡀⠑⠳⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠛⢉⡠⡲⡫⡪⡪⡣        MCP:       local only                                      │");
+  appendLine("╰──────────────────────────────────────────────────────────────────────────────────────────────────╯");
+  appendLine("");
+  appendLine("<span class=c-dim>type help to begin</span>");
   newPrompt();
 }
-
-// ── Commands ──
-var cmds={
-  help:function(){
-    appendLine('<span class="c-acc c-bold">Available commands:</span>');
-    appendLine('  <span class="c-acc">about, whoami</span>  - About Tukist');
-    appendLine('  <span class="c-acc">projects, ls</span>    - List projects');
-    appendLine('  <span class="c-acc">project &lt;n&gt;</span>   - Project details (1-6)');
-    appendLine('  <span class="c-acc">skills</span>          - Skills & tools');
-    appendLine('  <span class="c-acc">contact, links</span>   - Contact & links');
-    appendLine('  <span class="c-acc">game, ski</span>        - ASCII Ski game');
-    appendLine('  <span class="c-acc">neofetch</span>         - System info');
-    appendLine('  <span class="c-acc">clear, cls</span>       - Clear screen');
-    appendLine('  <span class="c-acc">history</span>          - Command history');
-    appendLine('  <span class="c-acc">help</span>             - This help');
-  },
-  about:function(){whoami()},
-  whoami:function(){
-    appendLine('<span class="c-acc c-bold"># whoami</span>');
-    appendLine('  Tukist — developer, builder, learner.');
-    appendLine('  Beihang University (BUAA). Python / TypeScript / ML.');
-    appendLine('  Interests: reverse engineering, web scraping, full-stack, AI security, Japanese.');
-  },
-  projects:function(){ls()},
-  ls:function(){
-    appendLine('<span class="c-acc c-bold">$ ls ~/projects/</span>');
-    appendLine('  <span class="c-acc">1.</span> OpenBUAA          <span class="c-dim">[Vue+Flask]</span>');
-    appendLine('  <span class="c-acc">2.</span> kimi-code-custom  <span class="c-dim">[TS]</span>');
-    appendLine('  <span class="c-acc">3.</span> ai-agent-security <span class="c-dim">[Research]</span>');
-    appendLine('  <span class="c-acc">4.</span> python-exe-unpacker <span class="c-dim">[RE]</span>');
-    appendLine('  <span class="c-acc">5.</span> japanese-learning  <span class="c-dim">[Web]</span>');
-    appendLine('  <span class="c-acc">6.</span> wechat-location    <span class="c-dim">[Proxy]</span>');
-    appendLine('  <span class="c-dim">$ project &lt;1-6&gt; for details</span>');
-  },
-  project:function(args){
-    var ps=[
-      {n:'OpenBUAA',t:'Vue + Flask',d:'BUAA Campus Service Web App. Course schedule, grades, check-in, elective, electricity, room booking.',g:''},
-      {n:'kimi-code-custom',t:'TypeScript',d:'Kimi Code CLI Custom Fork. Custom splash + orange theme + system info panel. MIT.',g:'https://github.com/Tukist/kimi-code-custom'},
-      {n:'ai-agent-security',t:'Jupyter',d:'AI Agent Security Research. Exploring AI coding assistant security boundaries.',g:'https://github.com/Tukist/ai-agent-security'},
-      {n:'Python-exe-unpacker',t:'Python',d:'PyInstaller reverse engineering + TD auto check-in.',g:''},
-      {n:'Japanese Learning Site',t:'HTML/CSS/JS',d:'Refold-method Japanese self-study guide. Single-file HTML.',g:''},
-      {n:'wechat_location_proxy',t:'Python/mitmproxy',d:'WeChat location spoofing proxy.',g:''}
-    ];
-    var i=parseInt(args[0]);
-    if(!i||i<1||i>6){appendLine('<span class="c-err">usage: project &lt;1-6&gt;</span>');return}
-    var p=ps[i-1];
-    appendLine('<span class="c-acc c-bold"># '+p.n+'</span>  <span class="c-dim">['+p.t+']</span>');
-    appendLine('  '+p.d);
-    if(p.g)appendLine('  <span class="c-dim">repo:</span> <span class="c-link" onclick="window.open(''+p.g+'')">'+p.g+'</span>');
-  },
-  skills:function(){
-    appendLine('<span class="c-acc c-bold">$ cat ~/skills.txt</span>');
-    appendLine('  Python [#####.]  TypeScript [####..]  HTML/CSS [####..]  SQL/C/C++ [###...]');
-    appendLine('  Vue3/Vite [####..]  Flask/FastAPI [####..]  PyTorch/sklearn [###...]');
-    appendLine('  Docker [####..]  Git [####..]  mitmproxy [####..]  ReverseEng [###...]');
-  },
-  contact:function(){links()},
-  links:function(){
-    appendLine('<span class="c-acc c-bold">$ cat ~/contact.txt</span>');
-    appendLine('  <span class="c-acc">GitHub:</span>  <span class="c-link" onclick="window.open('https://github.com/Tukist')">github.com/Tukist</span>');
-    appendLine('  <span class="c-acc">Email:</span>   <span class="c-link" onclick="window.open('mailto:2590568618@qq.com')">2590568618@qq.com</span>');
-    appendLine('  <span class="c-acc">QQ:</span>      830058869 (Japanese group)');
-    appendLine('  <span class="c-acc">Location:</span> Beijing, China * BUAA');
-  },
-  game:function(){ski()},
-  ski:function(){
-    appendLine('<span class="c-acc c-bold">$ launching ASCII Ski...</span>');
-    appendLine('  <span class="c-link" onclick="window.open('/','_blank')">opening game -></span>');
-    setTimeout(function(){window.open('/#game','_blank')},200);
-  },
-  neofetch:function(){
-    appendLine('<span class="c-acc">⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣿⣿⣿⣿⣷⢸⣿⣿⡜⢯⣷⡌⡻⣿⣿⣿⣆⢈⠻⠿⢿⣿⣿⣿⣿⣿⣿⣷⣦⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡁⢳⣿⣿⣿⣿⣿⣿⡜⣿⣿⣧⢀⢻⣷⠰⠈⢿⣿⣿⣧⢣⠉⠑⠪⢙⠿⠿⠿⠿⠿⠿⠿⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣱⡇⡞⣿⣿⣿⣿⣿⣿⡇⣿⣿⡏⡄⣧⠹⡇⠧⠈⢻⣿⣿⡇⢧⢢⠀⠀⠑⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣇⢃⢿⣿⣿⣿⣿⣿⣷⣿⣿⠇⢃⣡⣤⡹⠐⣿⣀⢻⣿⣿⢸⡎⠳⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣾⣿⣿⠘⡸⣿⣿⣿⣿⣿⣿⣿⡿⣰⣿⣿⢟⡷⠈⠋⠃⠎⢿⣿⡏⣿⠀⠘⢆⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⡐⢹⣿⣿⡐⢡⢹⣿⣿⣿⣿⡏⣿⢣⣿⣿⡑⠁⠔⠀⠉⠉⠢⡘⣿⡇⣿⡇⠀⡀⠡⡀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠘⣿⣿⣇⠇⢣⢻⣿⣿⣿⡇⢇⣾⣿⣿⡆⢸⣤⡀⠚⢂⠀⢡⢿⡇⣿⡇⠀⢿⠀⠀⠄⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠠⠹⣿⣿⡘⣆⢣⠻⣿⣿⢈⣾⣿⣿⣿⣶⣸⣏⢀⣬⣋⡼⣠⢸⢹⣿⡇⢠⣼⠙⡄⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⡇⠁⠹⣿⣇⠹⡃⠃⠙⡇⠘⢿⣿⣿⣿⣿⣿⣏⣓⣉⣭⣴⣿⠘⢸⣿⠁⠘⠋⠀⠹⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢷⠀⠀⠈⢿⣇⠂⣷⠄⠐⠀⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢠⢸⡏⠀⢀⣠⣴⣾⣿⣶⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢆⠀⠀⠀⠙⠆⠈⠢⠲⠥⣰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡞⣸⠁⠀⢸⣿⣿⣿⣿⣿⣿⡆⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠄⠃⠀⠀⠘⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣿⡏⠹⣿⣿⡿⠫⠊⠀⠀⠀⣶⠀⢻⣿⣿⣿⣿⡿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠛⠻⠿⠿⠿⢋⠀⠀⠀⠀⢀⣼⣿⡆⠈⣿⣿⣿⡟⣱⡷⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢁⣁⡀⠨⣛⠿⠶⠄⢀⣠⣾⣿⣿⣷⠀⢹⣿⡟⣴⠈⢃⣶⠔⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣿⣿⡄⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⡄⠈⣿⣿⡿⠀⡀⣿⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢙⠻⣿⣿⢀⠙⠻⠿⣿⣿⣿⣿⣿⣿⡇⠁⣿⠟⡀⠈⣧⢰⣿⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠿⠴⠮⣥⠻⢧⣤⣄⣀⡉⢩⣭⣍⣃⣀⣩⠎⢀⣼⠉⣼⡯⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⠁⣛⠓⢒⣒⣢⡭⢁⡈⠿⠿⠟⠹⠛⠁⠀⠀⠀⠰⠃⠂⠀⠀⠀</span>');
-    appendLine('<span class="c-acc c-bold">  tukist@terminal</span>');
-    appendLine('  <span class="c-dim">──────────────────</span>');
-    appendLine('  OS: BUAA Linux 2024.1 | Shell: zsh | Uptime: 3 years');
-    appendLine('  Packages: Python, TypeScript, ML | Editor: VS Code');
-    appendLine('  Theme: Green Phosphor CRT');
-  },
-  clear:function(){cls()},
-  cls:function(){out.innerHTML='';newPrompt()},
-  history:function(){
-    appendLine('<span class="c-acc c-bold">$ history</span>');
-    history.forEach(function(h,i){appendLine('  <span class="c-dim">'+String(i+1).padStart(3)+'</span>  '+h)});
-  }
-};
 
 function whoami(){cmds.whoami()}
 
