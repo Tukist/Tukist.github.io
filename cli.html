@@ -224,7 +224,7 @@ function exec(input){
   var args=input.trim().split(/\s+/),c=args[0].toLowerCase();args.shift();
   A.enter();
   if(!c)return;
-  if(c==='exit'||c==='quit'){writeln('<span class="c-dim">$ type 'exit' to disconnect</span>');return}
+  if(c==='exit'||c==='quit'){writeln('<span class="c-dim">$ type exit to disconnect</span>');return}
   if(cmds[c]){cmds[c](args)}
   else{writeln('<span class="c-err">command not found: '+esc(c)+'</span>  <span class="c-dim">type help for available commands</span>');A.err()}
 }
