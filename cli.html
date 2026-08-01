@@ -64,7 +64,12 @@ function appendLine(html){
 function newPrompt(){
   var d=el('div','line');
   var s=el('span','prompt');s.textContent='tukist@cli:~$ ';
-  var i=el('span');i.setAttribute('contenteditable','true');i.id='inline';
+  var i=document.createElement('input');
+  i.type='text';
+  i.id='inline';
+  i.setAttribute('autocomplete','off');
+  i.setAttribute('spellcheck','false');
+  i.style.cssText='background:none;border:none;color:var(--fg);font:inherit;outline:none;caret-color:var(--fa);width:60vw;text-shadow:0 0 3px rgba(51,255,51,.3)';
   var c=el('span','cursor');c.textContent='\u2588';
   d.appendChild(s);d.appendChild(i);d.appendChild(c);
   out.appendChild(d);
@@ -111,29 +116,28 @@ function exec(input){
 function handleKey(e){
   if(e.key==='Enter'){
     e.preventDefault();
-    var txt=inline.textContent.trim();
+    var txt=inline.value.trim();
     // Freeze current line
     var curLine=inline.parentElement;
     curLine.removeChild(curLine.querySelector('.cursor'));
-    inline.removeAttribute('contenteditable');
-    inline.id='';
-    curLine.innerHTML='<span class="prompt">tukist@cli:~$ </span>'+txt;
+    inline.removeEventListener('keydown',handleKey);
+    curLine.removeChild(inline);
+    curLine.innerHTML+='<span>'+txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</span>';
     history.push(txt);histIdx=history.length;
     if(txt)exec(txt);
     newPrompt();
   }else if(e.key==='ArrowUp'){
     e.preventDefault();
-    if(histIdx>0){histIdx--;inline.textContent=history[histIdx]}
+    if(histIdx>0){histIdx--;inline.value=history[histIdx]}
   }else if(e.key==='ArrowDown'){
     e.preventDefault();
-    if(histIdx<history.length-1){histIdx++;inline.textContent=history[histIdx]}
-    else{histIdx=history.length;inline.textContent=''}
+    if(histIdx<history.length-1){histIdx++;inline.value=history[histIdx]}
+    else{histIdx=history.length;inline.value=''}
   }else if(e.key==='Tab'){
     e.preventDefault();
-    var v=inline.textContent.toLowerCase(),keys=Object.keys(cmds);
-    for(var i=0;i<keys.length;i++){if(keys[i].startsWith(v)){inline.textContent=keys[i];break}}
+    var v=inline.value.toLowerCase(),keys=Object.keys(cmds);
+    for(var i=0;i<keys.length;i++){if(keys[i].startsWith(v)){inline.value=keys[i];break}}
   }else if(e.key.length===1||e.key==='Backspace'){
-    // Allow normal typing
     A.tick();
   }
 }
