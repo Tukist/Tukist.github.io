@@ -47,9 +47,7 @@ function newPrompt(){
 var d=el("div","line");
 var s=el("span","prompt");s.textContent="tukist@cli:~$ ";
 var i=document.createElement("input");i.type="text";i.id="inline";i.setAttribute("autocomplete","off");i.setAttribute("spellcheck","false");
-var c=el("span","cursor");c.textContent="\u2588";
-d.appendChild(s);d.appendChild(i);d.appendChild(c);
-out.appendChild(d);inline=i;inline.focus();
+d.appendChild(s);d.appendChild(i);out.appendChild(d);inline=i;inline.focus();
 inline.addEventListener("keydown",handleKey);
 out.scrollTop=out.scrollHeight;
 }
@@ -150,7 +148,6 @@ if(e.key==="Enter"){
 e.preventDefault();
 var txt=inline.value.trim();
 var curLine=inline.parentElement;
-curLine.removeChild(curLine.querySelector(".cursor"));
 inline.removeEventListener("keydown",handleKey);
 curLine.removeChild(inline);
 curLine.innerHTML+="<span>"+txt.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</span>";
