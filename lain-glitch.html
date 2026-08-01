@@ -19,7 +19,7 @@ body{background:var(--bg);color:var(--fg);font-family:'Cascadia Code','Courier N
 
 /* Main body jitter */
 .glitch-stage{animation:jitter 4s steps(3) infinite}
-@keyframes jitter{0%,90%,100%{transform:translate(0)}10%{transform:translate(-5px,2px)}20%{transform:translate(3px,-1px)}30%{transform:translate(-2px,3px)}85%{transform:translate(4px,0)}}
+@keyframes jitter{0%,90%,100%{transform:translate(0)}10%{transform:translate(-2px,1px)}20%{transform:translate(1.5px,-.5px)}30%{transform:translate(-1px,1.5px)}85%{transform:translate(2px,0)}}
 
 /* Noise grain */
 .noise-grain{position:fixed;inset:0;pointer-events:none;z-index:8;opacity:.04;mix-blend-mode:overlay}
