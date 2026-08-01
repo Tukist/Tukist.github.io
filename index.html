@@ -87,6 +87,7 @@ hr{border:none;border-top:var(--bd);margin:var(--md) 0}
     <a href="#about" class="on">About</a>
     <a href="#projects">Projects</a>
     <a href="#skills">Skills</a>
+    <a href="#game">Game</a>
     <a href="#contact">Contact</a>
   </div>
 </div></nav>
@@ -225,6 +226,22 @@ hr{border:none;border-top:var(--bd);margin:var(--md) 0}
   </div>
 </div></section>
 
+<div class="container"><div class="br-sep"><span class="br" aria-hidden="true">&#x2804;&#x2804;&#x2804; &#x2804;&#x2804;&#x2804; &#x2804;&#x2804;&#x2804; &#x2804;&#x2804;&#x2804; &#x2804;&#x2804;&#x2804; &#x2804;&#x2804;&#x2804; &#x2804;&#x2804;&#x2804; &#x2804;&#x2804;&#x2804; &#x2804;&#x2804;&#x2804; &#x2804;&#x2804;&#x2804; &#x2804;&#x2804;&#x2804; &#x2804;&#x2804;&#x2804;</span></div></div>
+
+<section class="section" id="game" style="padding-top:0"><div class="container">
+  <span class="stag">Play</span>
+  <h2>&#x283F; ASCII Jump</h2>
+  <p class="ts mb">Space / Click to jump. Dodge the obstacles. How far can you go?</p>
+  <div style="max-width:580px;margin:0 auto;border:2px solid var(--b);overflow:hidden">
+    <pre id="gs" style="color:var(--g1);background:var(--b);font-family:monospace;font-size:.62rem;line-height:1.1;padding:var(--sm);margin:0;min-height:180px;white-space:pre;user-select:none;cursor:pointer;overflow:hidden" title="Click or Space to jump"></pre>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:var(--xs) var(--sm);background:var(--w);border-top:2px solid var(--b)">
+      <span style="font-size:.78rem;font-weight:600">Score: <strong id="gsc">0</strong></span>
+      <span style="font-size:.7rem;color:var(--g5)">Best: <strong id="ghs">0</strong></span>
+      <button id="gsb" style="font-family:var(--f);font-weight:600;font-size:.72rem;padding:4px 16px;border:2px solid var(--b);background:var(--b);color:var(--w);cursor:pointer;transition:all var(--tr)" onmouseover="this.style.background='var(--w)';this.style.color='var(--b)'" onmouseout="this.style.background='var(--b)';this.style.color='var(--w)'">&#x25B6; Start</button>
+    </div>
+  </div>
+</div></section>
+
 <section class="section" id="contact" style="padding-top:0"><div class="container">
   <span class="stag">Contact</span>
   <h2>&#x283F; Contact</h2>
@@ -334,6 +351,75 @@ window.addEventListener('scroll',function(){
     a.classList.toggle('on',a.getAttribute('href')==='#'+cur||(cur===''&&a.getAttribute('href')==='#about'));
   });
 });
+
+// ── ASCII Jump Game ──
+(function(){
+var W=54,H=14,G=H-2,gs=document.getElementById('gs'),gsc=document.getElementById('gsc'),
+    ghs=document.getElementById('ghs'),gsb=document.getElementById('gsb'),
+    py,vy,obs,score,speed,fc,run,high=parseInt(localStorage.getItem('jp_ski_high')||'0');
+ghs.textContent=high;
+
+function init(){py=G;vy=0;obs=[];score=0;speed=1.2;fc=0;gsc.textContent='0';}
+
+function jump(){if(!run)return;if(py===G)vy=-2.6;}
+
+function tick(){
+  fc++; if(py<G){vy+=0.22;py+=vy;if(py>=G){py=G;vy=0;}}
+  for(var i=obs.length-1;i>=0;i--){obs[i].x-=speed;if(obs[i].x<-3)obs.splice(i,1);}
+  var sp=Math.max(16,Math.floor(35-score/80));
+  if(fc%sp===0){var t=Math.random()<0.35?'rock':'tree';obs.push({x:W,t:t});}
+  speed=1.2+Math.floor(score/150)*0.25;
+  for(var i=0;i<obs.length;i++){var o=obs[i];
+    if(o.x>=6&&o.x<=11&&py>=G-2){end();return;}
+  }
+  score++;gsc.textContent=score;draw();
+}
+
+function draw(){
+  var g=[];for(var y=0;y<H;y++){var r=[];for(var x=0;x<W;x++)r.push(' ');g.push(r);}
+  // ground
+  g[G][0]='\u283F';g[G+1][0]='\u283F';for(var x=1;x<W;x++){g[G][x]='\u283F';g[G+1][x]='\u283F';}
+  // background mountains
+  g[G-1][2]='\u2804';g[G-1][15]='\u2804';g[G-1][28]='\u2804';g[G-1][40]='\u2804';
+  g[G-2][16]='\u2802';g[G-2][29]='\u2802';g[G-2][41]='\u2802';
+  // obstacles
+  for(var i=0;i<obs.length;i++){var o=obs[i],ox=Math.floor(o.x);
+    if(o.t==='tree'){if(ox>=0&&ox<W){g[G-3][ox]='\u28E3';g[G-2][ox]='\u28E3';g[G-1][ox]='\u28E3';g[G][ox]='\u28E3';}
+      if(ox+1>=0&&ox+1<W){g[G-2][ox+1]='\u28E3';g[G-1][ox+1]='\u28E3';g[G][ox+1]='\u28E3';}
+      if(ox+2>=0&&ox+2<W){g[G-1][ox+2]='\u28E3';g[G][ox+2]='\u28E3';}}
+    else{if(ox>=0&&ox<W){g[G-2][ox]='\u2836';g[G-1][ox]='\u2836';g[G][ox]='\u2836';}}
+  }
+  // player
+  var pp=Math.floor(py);
+  if(pp>=0&&pp<H){g[pp][7]='\u25D0';g[pp][8]='\u25D0';}
+  // render
+  var s='';for(var y=0;y<H;y++)s+=g[y].join('')+(y<H-1?'\n':'');
+  gs.textContent=s;
+}
+
+function end(){
+  run=false;gsb.textContent='\u25B6 Start';gsb.disabled=false;
+  if(score>high){high=score;localStorage.setItem('jp_ski_high',high);ghs.textContent=high;}
+  gs.textContent='\n\n\n    GAME OVER\n    Score: '+score+'m    Best: '+high+'m\n\n    \u283F Click Start to retry \u283F';
+}
+
+function start(){
+  init();run=true;gsb.textContent='\u25A0 Stop';gsb.disabled=false;draw();requestAnimationFrame(loop);
+}
+function stop(){run=false;gsb.textContent='\u25B6 Start';gsb.disabled=false;}
+gsb.onclick=function(){if(run)stop();else start();};
+
+var lastT=0;
+function loop(t){
+  if(!run)return;
+  if(t-lastT>40){tick();lastT=t;}
+  requestAnimationFrame(loop);
+}
+document.addEventListener('keydown',function(e){if(e.code==='Space'){e.preventDefault();if(!run)start();else jump();}});
+gs.addEventListener('click',function(){if(!run)start();else jump();});
+init();draw();
+gsb.textContent='\u25B6 Start';gsb.disabled=false;
+})();
 </script>
 </body>
 </html>
