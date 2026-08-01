@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tukist — Developer &amp; Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--b:#1A1A1A;--w:#FFF;--a:#BC002D;--ah:#8C0020;--g1:#F5F5F5;--g2:#E8E8E8;--g3:#D0D0D0;--g5:#757575;--g7:#424242;--f:'Inter',-apple-system,sans-serif;--fj:'Noto Sans JP',var(--f);--xs:.5rem;--sm:1rem;--md:2rem;--lg:3rem;--xl:5rem;--mw:960px;--bd:1px solid var(--g3);--tr:160ms ease}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px;scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:var(--f);color:var(--b);background:var(--w);line-height:1.75}
+
+h1,h2,h3{font-weight:700;letter-spacing:-0.02em;line-height:1.15}
+h1{font-size:clamp(2rem,4vw,3rem)}h2{font-size:clamp(1.3rem,2.5vw,1.7rem)}h3{font-size:1rem}
+
+a{color:var(--a);text-decoration:none;border-bottom:1px solid transparent;transition:border-color var(--tr)}a:hover{border-bottom-color:var(--a)}
+
+.container{max-width:var(--mw);margin:0 auto;padding:0 var(--md)}
+
+/* ── Nav ── */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.96);backdrop-filter:blur(8px);border-bottom:var(--bd)}
+.nav-inner{max-width:var(--mw);margin:0 auto;padding:0 var(--md);display:flex;align-items:center;justify-content:space-between;height:54px}
+.nav-brand{font-weight:700;font-size:.95rem;color:var(--b);cursor:pointer;border:none;background:none;font-family:var(--f);display:flex;align-items:center;gap:6px}
+.nav-brand .dot{display:inline-block;width:6px;height:6px;background:var(--a)}
+.nav-links{display:flex;gap:2px;list-style:none}
+.nav-links a{font-size:.75rem;font-weight:500;color:var(--g5);padding:4px 8px;border:none;transition:color var(--tr);position:relative}
+.nav-links a:hover,.nav-links a.on{color:var(--b)}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:8px;right:8px;height:2px;background:var(--a);transform:scaleX(0);transition:transform var(--tr)}
+.nav-links a:hover::after,.nav-links a.on::after{transform:scaleX(1)}
+.nav-toggle{display:none;background:none;border:var(--bd);padding:5px 10px;cursor:pointer;font-size:1rem}
+
+/* ── Braille art helpers ── */
+.br{font-family:monospace;letter-spacing:0;line-height:1;color:var(--g3);user-select:none;white-space:pre}
+.br-dark{color:var(--g7)}.br-accent{color:var(--a)}.br-bold{font-weight:700;color:var(--g5)}
+.br-sep{text-align:center;margin:var(--lg) 0 var(--md);font-size:.72rem;overflow:hidden}
+.br-sep span{display:inline-block}
+.br-dots{font-size:.62rem;letter-spacing:.15em;color:var(--g3);user-select:none}
+.br-block{border:2px solid var(--g3);padding:var(--md);background:var(--g1);font-family:monospace;font-size:.72rem;line-height:1.1;white-space:pre;color:var(--g7);overflow-x:auto;display:inline-block}
+.br-tag{font-family:monospace;font-size:.65rem;color:var(--g5);letter-spacing:.05em;display:inline-block;padding:2px 6px;border:1px dotted var(--g3)}
+.br-bullet{font-family:monospace;color:var(--g3);font-size:.72rem;margin-right:4px}
+.br-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(1ch,1fr));gap:0;font-family:monospace;font-size:.62rem;line-height:1;color:var(--g3);letter-spacing:0}
+
+.stag{font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--a);display:block;margin-bottom:var(--xs)}
+hr{border:none;border-top:var(--bd);margin:var(--md) 0}
+.mt{margin-top:var(--sm)}.mt2{margin-top:var(--md)}.mt3{margin-top:var(--lg)}.mb{margin-bottom:var(--sm)}
+.ts{font-size:.82rem;color:var(--g5)}
+.co{border-left:3px solid var(--b);padding:var(--sm) var(--md);margin:var(--md) 0;background:var(--g1);font-size:.9rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:var(--sm)}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--sm)}
+
+/* ── Card ── */
+.card{border:var(--bd);padding:var(--md);background:var(--w);transition:all var(--tr)}.card:hover{border-color:var(--b)}
+.ca{border-left:3px solid var(--a)}
+.card-title{font-weight:600;font-size:.95rem;margin-bottom:4px}
+.card-meta{font-size:.72rem;color:var(--g5);margin-bottom:var(--xs)}
+.card-desc{font-size:.82rem;color:var(--g7);line-height:1.55}
+.tag{display:inline-block;font-size:.6rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:1px 7px;border:1px solid var(--g3);margin-right:4px;margin-bottom:4px}.ta{border-color:var(--a);color:var(--a)}
+
+/* ── Hero ── */
+.hero{min-height:70vh;display:flex;align-items:center;padding:var(--xl) 0 var(--lg);border-bottom:2px solid var(--b);position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;pointer-events:none;opacity:.15;font-family:monospace;font-size:clamp(.5rem,1.2vw,.75rem);line-height:1.05;white-space:pre;color:var(--b);user-select:none;padding-right:var(--md)}
+.hero-content{position:relative;z-index:1}
+.hero .hl{display:inline-block;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--a);margin-bottom:var(--xs);padding:2px 8px;border:1px solid var(--a)}
+.hero h1{margin-bottom:var(--xs)}
+.hero .sub{font-size:1rem;color:var(--g5);margin-bottom:var(--md);max-width:520px}
+.hero-links{display:flex;gap:var(--sm);flex-wrap:wrap;align-items:center}
+
+/* ── Braille canvas (Hero right) ── */
+.b-canvas{font-family:monospace;font-size:clamp(.45rem,.9vw,.65rem);line-height:1.05;color:var(--b);white-space:pre;user-select:none;opacity:.85;text-align:right}
+
+/* ── Section ── */
+.section{padding:var(--xl) 0}
+
+/* ── Skills ── */
+.skill-bar{margin-bottom:var(--sm)}
+.skill-label{display:flex;justify-content:space-between;font-size:.78rem;font-weight:500;margin-bottom:2px}
+.skill-track{height:4px;background:var(--g2);overflow:hidden}
+.skill-fill{height:100%;background:var(--b);transition:width 800ms ease}
+.skill-dots{display:flex;gap:3px;margin-top:2px}
+.skill-dot{width:4px;height:4px;background:var(--g3)}
+.skill-dot.on{background:var(--b)}
+
+/* ── Timeline ── */
+.tl{position:relative;padding-left:var(--md)}.tl::before{content:'';position:absolute;left:5px;top:4px;bottom:4px;width:2px;background:var(--g3)}
+.tl-item{position:relative;padding-bottom:var(--md)}.tl-item:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:-19px;top:5px;width:14px;height:14px;border:2px solid var(--b);background:var(--w)}
+.tl-item:first-child .tl-dot{background:var(--b)}
+.tl-date{font-size:.68rem;color:var(--g5);font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.tl-title{font-weight:600;font-size:.9rem}
+.tl-desc{font-size:.8rem;color:var(--g7)}
+
+/* ── Footer ── */
+.footer{border-top:2px solid var(--b);padding:var(--lg) 0;position:relative}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:var(--md)}
+.footer p{font-size:.8rem;color:var(--g5)}
+.footer-bottom{margin-top:var(--md);padding-top:var(--sm);border-top:var(--bd);display:flex;justify-content:space-between;align-items:center;font-size:.7rem;color:var(--g5);flex-wrap:wrap;gap:var(--xs)}
+.footer-braille{font-family:monospace;font-size:.55rem;color:var(--g3);letter-spacing:.1em;line-height:1;user-select:none;white-space:pre}
+
+/* ── Link list ── */
+.ll{list-style:none}.ll li{padding:var(--xs) 0;border-bottom:var(--bd);display:flex;align-items:center;gap:var(--xs)}
+.ll li:last-child{border-bottom:none}
+.ll .lb{font-family:monospace;font-size:.65rem;color:var(--g3);width:16px;text-align:center;flex-shrink:0}
+.ll a{flex:1;border:none;font-size:.85rem}.ll .ar{color:var(--g3);transition:transform var(--tr);font-family:monospace;font-size:.72rem}
+.ll a:hover+.ar{transform:translateX(4px)}
+
+/* ── Dot pattern background ── */
+.dot-bg{background-image:radial-gradient(var(--g3) 1px,transparent 1px);background-size:16px 16px}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .grid2,.grid3,.footer-grid{grid-template-columns:1fr}
+  .hero-bg{display:none}
+  .nav-links{display:none;position:absolute;top:54px;left:0;right:0;background:var(--w);border-bottom:var(--bd);flex-direction:column;padding:var(--sm)}
+  .nav-links.open{display:flex}.nav-toggle{display:block}
+}@media(max-width:480px){.b-canvas{display:none}}
+</style>
+</head>
+<body>
+
+<!-- ════════════════ NAV ════════════════ -->
+<nav class="nav"><div class="nav-inner">
+  <a href="#" class="nav-brand"><span class="dot"></span><span class="dot"></span>Tukist</a>
+  <button class="nav-toggle" id="nt" aria-label="菜单">☰</button>
+  <div class="nav-links" id="nl">
+    <a href="#about" class="on">About</a>
+    <a href="#projects">Projects</a>
+    <a href="#skills">Skills</a>
+    <a href="#contact">Contact</a>
+  </div>
+</div></nav>
+
+<!-- ════════════════ HERO ════════════════ -->
+<header class="hero">
+  <div class="hero-bg" aria-hidden="true">⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⣀⣀⣀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⢀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⠀⠀⠀⠀
+⠀⠀⢀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡀⠀⠀
+⠀⣰⣿⠟⠋⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠙⠻⣿⣆⠀
+⢠⣿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡄
+⢸⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⡇
+⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⠿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇
+⠘⣿⡀⠀⢀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⠀⢀⣿⠃
+⠀⠙⢿⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⡿⠋⠀
+⠀⠀⠀⠉⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠉⠀⠀⠀
+</div>
+  <div class="container hero-content">
+    <span class="hl">⣿ Developer &amp; Builder</span>
+    <h1>HI, I'M TUKIST.<br>I BUILD THINGS<br>FOR THE INTERNET.</h1>
+    <p class="sub">北航在读 · 全栈兴趣者 · 热爱 Python / TypeScript / ML · 对逆向工程与自动化有持久热情</p>
+    <div class="hero-links">
+      <a href="https://github.com/Tukist" target="_blank" class="card ca" style="display:inline-flex;align-items:center;gap:8px;border:none;padding:8px 18px;font-weight:600;font-size:.82rem">
+        <span style="font-family:monospace">⣿</span> GitHub
+      </a>
+      <a href="#contact" style="padding:8px 18px;border:2px solid var(--b);font-weight:600;font-size:.82rem;color:var(--b)">
+        <span style="font-family:monospace">⠿</span> Contact
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ════════════════ ABOUT ════════════════ -->
+<section class="section" id="about"><div class="container">
+  <span class="stag">About</span>
+  <h2>⠠⠁⠃⠕⠥⠞</h2>
+
+  <div class="grid2 mt2">
+    <div>
+      <p style="font-size:.95rem;line-height:1.8">嗨，我是 <strong>Tukist</strong>——一个对技术充满好奇的 Builder。</p>
+      <p class="ts mt">目前在北京航空航天大学（BUAA）就读。日常在 Python、TypeScript 和机器学习之间游走，享受从零到一构建工具的乐趣。</p>
+      <p class="ts mt">兴趣领域包括：逆向工程、网络爬虫、Web 全栈开发、AI 安全、以及日语自学（Refold 方法实践者）。坚信好的工具应该像 Braille 点阵一样——简单、精确、组合出无限可能。</p>
+    </div>
+    <div class="dot-bg" style="padding:var(--md);display:flex;align-items:center;justify-content:center">
+      <pre class="br br-dark" style="font-size:.55rem" aria-hidden="true">⡿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿
+⣷⡿⠟⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⢿⣾
+⣿⡇⠀⠀⠀⠀⠀⠀⢠⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⡄⠀⠀⠀⠀⠀⠀⢸⣿
+⣿⡇⠀⠀⠀⠀⠀⠀⠈⠛⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⠿⠿⠿⠿⠿⠿⠛⠁⠀⠀⠀⠀⠀⠀⢸⣿
+⣿⡇⠀    T U K I S T    ⠀⢸⣿
+⣿⡇    BUAA · CS · Builder    ⢸⣿
+⣿⡇⠀    ⠿ Python · TS · ML ⠿    ⠀⢸⣿
+⣿⡇⠀⠀⠀⠀⠀⠀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⠀⠀⠀⠀⠀⢸⣿
+⣿⡇⠀⠀⠀⠀⠀⠀⠙⠻⣿⣿⣿⣿⡿⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠟⠋⠀⠀⠀⠀⠀⢸⣿
+⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠈⢿⣿⣿⠁⠀⠘⢿⣿⣿⣿⣿⣿⣿⡿⠃⠀⠈⠙⠛⠛⠛⠛⠛⠛⠉⠁⠀⠀⠀⠀⠀⢸⣿
+⣿⣧⣤⣤⣤⣤⣤⣤⣤⣤⣼⣿⣿⣿⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣷⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣾⣿
+⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿</pre>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <h3 class="mt3">⣿ Timeline</h3>
+  <div class="tl mt">
+    <div class="tl-item"><div class="tl-dot"></div>
+      <div class="tl-date">2024 — Now</div>
+      <div class="tl-title">BUAA 本科在读</div>
+      <div class="tl-desc">计算机相关课程 · 参与校园服务平台 OpenBUAA 前后端开发</div>
+    </div>
+    <div class="tl-item"><div class="tl-dot"></div>
+      <div class="tl-date">2025</div>
+      <div class="tl-title">JMComic-Crawler-Python 开源贡献</div>
+      <div class="tl-desc">Python 爬虫框架的维护与功能扩展</div>
+    </div>
+    <div class="tl-item"><div class="tl-dot"></div>
+      <div class="tl-date">2026</div>
+      <div class="tl-title">AI Agent 安全研究</div>
+      <div class="tl-desc">探索 AI 编程助手的安全边界 · Kimi Code CLI 定制开发</div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ════════════════ Braille Separator ════════════════ -->
+<div class="container"><div class="br-sep"><span class="br br-bold" aria-hidden="true">⠿⠿⠿ ⠿⠿⠿ ⠿⠿⠿ ⠿⠿⠿ ⠿⠿⠿ ⠿⠿⠿ ⠿⠿⠿ ⠿⠿⠿ ⠿⠿⠿ ⠿⠿⠿ ⠿⠿⠿ ⠿⠿⠿</span></div></div>
+
+<!-- ════════════════ PROJECTS ════════════════ -->
+<section class="section" id="projects" style="padding-top:0"><div class="container">
+  <span class="stag">Projects</span>
+  <h2>⠠⠏⠗⠕⠚⠑⠉⠞⠎</h2>
+  <p class="ts mb">精选项目一览。更多在 <a href="https://github.com/Tukist" target="_blank">GitHub</a>。</p>
+
+  <div class="grid2">
+    <!-- OpenBUAA -->
+    <div class="card ca">
+      <div class="card-title">OpenBUAA <span class="br-tag">Vue + Flask</span></div>
+      <div class="card-meta">北航校园服务 Web 应用</div>
+      <div class="card-desc">课表查询 · 成绩管理 · 阳光打卡 · 博雅选课 · 电费查询 · 研讨室预约。前后端分离架构，Vue 3 + Vite + Tailwind CSS + Pinia。</div>
+      <div class="mt"><span class="tag">Vue 3</span><span class="tag">Python</span><span class="tag">Flask</span><span class="tag">Tailwind</span></div>
+    </div>
+
+    <!-- kimi-code-custom -->
+    <a href="https://github.com/Tukist/kimi-code-custom" target="_blank" class="card ca" style="display:block">
+      <div class="card-title">kimi-code-custom <span class="br-tag">TS</span></div>
+      <div class="card-meta">Kimi Code CLI 定制版</div>
+      <div class="card-desc">自定义启动画面 + 橘黄主题 + 系统信息面板的 Kimi Code CLI 分支。</div>
+      <div class="mt"><span class="tag ta">TypeScript</span><span class="tag">MIT</span></div>
+    </a>
+
+    <!-- ai-agent-security -->
+    <a href="https://github.com/Tukist/ai-agent-security" target="_blank" class="card ca" style="display:block">
+      <div class="card-title">ai-agent-security <span class="br-tag">Research</span></div>
+      <div class="card-meta">AI Agent 安全研究</div>
+      <div class="card-desc">AI 编程助手的安全边界探索项目。</div>
+      <div class="mt"><span class="tag">Jupyter</span><span class="tag">Security</span></div>
+    </a>
+
+    <!-- Python-exe-unpacker -->
+    <div class="card ca">
+      <div class="card-title">Python-exe-unpacker <span class="br-tag">逆向</span></div>
+      <div class="card-meta">PyInstaller 逆向工程</div>
+      <div class="card-desc">Python 可执行文件解包与反编译工具链，包含 TD 自动打卡服务。</div>
+      <div class="mt"><span class="tag">Python</span><span class="tag">Reverse Eng</span><span class="tag">mitmproxy</span></div>
+    </div>
+
+    <!-- Japanese Learning Site -->
+    <div class="card ca">
+      <div class="card-title">日本語入門 <span class="br-tag">Web</span></div>
+      <div class="card-meta">Refold 方式日语自学指南</div>
+      <div class="card-desc">单文件 HTML 静态站。五十音图 + 课程 + 语料库 + 闪卡练习。瑞士极简风格设计。</div>
+      <div class="mt"><span class="tag">HTML/CSS</span><span class="tag">Vanilla JS</span></div>
+    </div>
+
+    <!-- wechat_location_proxy -->
+    <div class="card ca">
+      <div class="card-title">wechat_location_proxy <span class="br-tag">Proxy</span></div>
+      <div class="card-meta">微信位置伪造代理</div>
+      <div class="card-desc">基于 mitmproxy 的位置代理工具。</div>
+      <div class="mt"><span class="tag">Python</span><span class="tag">mitmproxy</span></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ════════════════ Braille Separator ════════════════ -->
+<div class="container"><div class="br-sep"><span class="br" aria-hidden="true">⠄⠄⠄ ⠄⠄⠄ ⠄⠄⠄ ⠄⠄⠄ ⠄⠄⠄ ⠄⠄⠄ ⠄⠄⠄ ⠄⠄⠄ ⠄⠄⠄ ⠄⠄⠄ ⠄⠄⠄ ⠄⠄⠄ ⠄⠄⠄ ⠄⠄⠄</span></div></div>
+
+<!-- ════════════════ SKILLS ════════════════ -->
+<section class="section" id="skills" style="padding-top:0"><div class="container">
+  <span class="stag">Skills</span>
+  <h2>⠠⠎⠅⠊⠇⠇⠎</h2>
+
+  <div class="grid2 mt2">
+    <div>
+      <h3 style="font-size:.85rem"><span class="br-bullet">⠿</span> Languages</h3>
+      <div class="skill-bar"><div class="skill-label"><span>Python</span><span>⭐⭐⭐⭐</span></div><div class="skill-track"><div class="skill-fill" style="width:90%"></div></div><div class="skill-dots"><span class="skill-dot on"></span><span class="skill-dot on"></span><span class="skill-dot on"></span><span class="skill-dot on"></span><span class="skill-dot"></span></div></div>
+      <div class="skill-bar"><div class="skill-label"><span>TypeScript / JavaScript</span><span>⭐⭐⭐</span></div><div class="skill-track"><div class="skill-fill" style="width:70%"></div></div><div class="skill-dots"><span class="skill-dot on"></span><span class="skill-dot on"></span><span class="skill-dot on"></span><span class="skill-dot"></span><span class="skill-dot"></span></div></div>
+      <div class="skill-bar"><div class="skill-label"><span>HTML / CSS</span><span>⭐⭐⭐</span></div><div class="skill-track"><div class="skill-fill" style="width:70%"></div></div></div>
+      <div class="skill-bar"><div class="skill-label"><span>SQL / C / C++</span><span>⭐⭐</span></div><div class="skill-track"><div class="skill-fill" style="width:45%"></div></div></div>
+    </div>
+    <div>
+      <h3 style="font-size:.85rem"><span class="br-bullet">⠿</span> Tools &amp; Frameworks</h3>
+      <div class="skill-bar"><div class="skill-label"><span>Vue 3 / Vite / Tailwind</span><span>⭐⭐⭐</span></div><div class="skill-track"><div class="skill-fill" style="width:70%"></div></div></div>
+      <div class="skill-bar"><div class="skill-label"><span>Flask / FastAPI</span><span>⭐⭐⭐</span></div><div class="skill-track"><div class="skill-fill" style="width:65%"></div></div></div>
+      <div class="skill-bar"><div class="skill-label"><span>PyTorch / scikit-learn</span><span>⭐⭐</span></div><div class="skill-track"><div class="skill-fill" style="width:50%"></div></div></div>
+      <div class="skill-bar"><div class="skill-label"><span>Docker / Git / mitmproxy</span><span>⭐⭐⭐</span></div><div class="skill-track"><div class="skill-fill" style="width:65%"></div></div></div>
+      <div class="skill-bar"><div class="skill-label"><span>Reverse Engineering</span><span>⭐⭐</span></div><div class="skill-track"><div class="skill-fill" style="width:50%"></div></div></div>
+    </div>
+  </div>
+
+  <!-- Braille tag cloud -->
+  <div class="mt2" style="text-align:center">
+    <p class="ts mb">⠿ 技术标签 ⠿</p>
+    <p style="font-family:monospace;font-size:.62rem;color:var(--g3);letter-spacing:.08em;word-spacing:.5em;line-height:2">
+      Python · TypeScript · Node.js · Vue · React · Flask · FastAPI ·
+      PyTorch · TensorFlow · ONNX · Docker · Git · GitHub Actions ·
+      mitmproxy · Selenium · Playwright · SQLite · Tailwind · Vite ·
+      ReverseEng · WebCrawler · ML · AI · Security
+    </p>
+  </div>
+</div></section>
+
+<!-- ════════════════ CONTACT ════════════════ -->
+<section class="section" id="contact" style="padding-top:0"><div class="container">
+  <span class="stag">Contact</span>
+  <h2>⠠⠉⠕⠝⠞⠁⠉⠞</h2>
+
+  <div class="grid2 mt2">
+    <div>
+      <ul class="ll">
+        <li><span class="lb">⣿</span><a href="https://github.com/Tukist" target="_blank">GitHub / Tukist</a><span class="ar">→</span></li>
+        <li><span class="lb">⠿</span><a href="mailto:2590568618@qq.com">2590568618@qq.com</a><span class="ar">→</span></li>
+        <li><span class="lb">⠄</span><span>QQ 群（日语学习）830058869</span></li>
+        <li><span class="lb">⠂</span><span>Location: Beijing, China</span></li>
+        <li><span class="lb">⠁</span><span>BUAA — 北京航空航天大学</span></li>
+      </ul>
+    </div>
+    <div class="dot-bg" style="padding:var(--md);display:flex;align-items:center;justify-content:center">
+      <pre class="br br-dark" style="font-size:.5rem" aria-hidden="true">⡿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⠟⠛⠛⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣾
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿        ⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⡇  ⣿⡇⠈⠛⠻⢿⣿⣿⣿⠿⠛⠁ ⢸⢸
+⣿⣿⡇  ⣿⡇              ⢸⢸
+⣿⣿⡇  ⣿⣇⣀⣀⣀⣀⣀⣀⣀⣀⣀⣸⢸
+⣿⣿⡇  ⠈⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠁ ⢸⢸
+⠛⠛⠛           T U K I S T       ⠛⠛</pre>
+    </div>
+  </div>
+</div></section>
+
+<!-- ════════════════ FOOTER ════════════════ -->
+<footer class="footer"><div class="container">
+  <div class="footer-grid">
+    <div>
+      <p><strong>Tukist</strong></p>
+      <p>Developer · Builder · Learner</p>
+      <p class="ts">⣿ Building with curiosity ⣿</p>
+    </div>
+    <div>
+      <p><strong>Navigate</strong></p>
+      <p><a href="#about">About</a></p>
+      <p><a href="#projects">Projects</a></p>
+      <p><a href="#skills">Skills</a></p>
+    </div>
+    <div>
+      <p><strong>Links</strong></p>
+      <p><a href="https://github.com/Tukist" target="_blank">GitHub</a></p>
+      <p><a href="https://refold.la/roadmap" target="_blank">Refold</a></p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>Built with Swiss Style · Braille Aesthetic</span>
+    <span>© 2026 Tukist</span>
+  </div>
+  <div class="footer-braille mt" aria-hidden="true">
+⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿
+⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄  BUILT WITH BRAILLE  ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿
+  </div>
+</div></footer>
+
+<script>
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t)t.scrollIntoView({behavior:'smooth'});
+    document.getElementById('nl').classList.remove('open');
+  });
+});
+
+// Nav toggle
+document.getElementById('nt').addEventListener('click',()=>{
+  document.getElementById('nl').classList.toggle('open');
+});
+
+// Active nav on scroll
+const sections=document.querySelectorAll('.section, header');
+const navLinks=document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  sections.forEach(s=>{
+    const top=s.offsetTop-80;
+    if(window.scrollY>=top)cur=s.getAttribute('id')||'';
+  });
+  navLinks.forEach(a=>{
+    a.classList.toggle('on',a.getAttribute('href')==='#'+cur||(cur===''&&a.getAttribute('href')==='#about'));
+  });
+});
+
+// Skill bar animation on scroll
+const observer=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const fills=e.target.querySelectorAll('.skill-fill');
+      fills.forEach(f=>{f.style.width=f.style.width});
+    }
+  });
+},{threshold:0.3});
+document.querySelectorAll('.skill-bar').forEach(b=>observer.observe(b));
+</script>
+</body>
+</html>
