@@ -38,7 +38,7 @@ var out=document.getElementById("out"),inline,hst=[],hstIdx=-1;
 var SFX={ctx:null,init(){try{this.ctx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}},
 p(f,d,t){if(!this.ctx)this.init();if(!this.ctx)return;var o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=t||"square";o.frequency.value=f;g.gain.setValueAtTime(.03,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,this.ctx.currentTime+d);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+d)},
 tick(){this.p(800,.025)},enter(){this.p(500,.05)},err(){this.p(150,.2,"sawtooth")}};
-document.addEventListener("click",function(){A.init()},{once:true});
+document.addEventListener("click",function(){SFX.init()},{once:true});
 
 function el(t,c){var d=document.createElement(t);if(c)d.className=c;return d}
 function appendLine(h){var d=el("div","line");d.innerHTML=h;out.appendChild(d);}
@@ -184,10 +184,10 @@ appendLine(new Date().toString());
 
 function exec(input){
 var args=input.trim().split(/\s+/),c=(args[0]||"").toLowerCase();args.shift();
-A.enter();
+SFX.enter();
 if(!c)return;
 if(cmds[c]){cmds[c](args)}
-else{appendLine("<span class=c-err>command not found: "+c+"</span>");A.err()}
+else{appendLine("<span class=c-err>command not found: "+c+"</span>");SFX.err()}
 }
 
 function handleKey(e){
@@ -212,7 +212,7 @@ else{hstIdx=hst.length;inline.value=""}
 e.preventDefault();
 var v=inline.value.toLowerCase(),keys=Object.keys(cmds);
 for(var i=0;i<keys.length;i++){if(keys[i].startsWith(v)){inline.value=keys[i];break}}
-}else if(e.key.length===1||e.key==="Backspace"){A.tick();}
+}else if(e.key.length===1||e.key==="Backspace"){SFX.tick();}
 }
 
 out.addEventListener("click",function(){if(inline)inline.focus();});
