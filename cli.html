@@ -35,7 +35,7 @@ body{font-family:'Cascadia Code','Consolas','Courier New',monospace;font-size:14
 <script>
 var out=document.getElementById("out"),inline,hst=[],hstIdx=-1;
 
-var A={ctx:null,init(){try{this.ctx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}},
+var SFX={ctx:null,init(){try{this.ctx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}},
 p(f,d,t){if(!this.ctx)this.init();if(!this.ctx)return;var o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=t||"square";o.frequency.value=f;g.gain.setValueAtTime(.03,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,this.ctx.currentTime+d);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+d)},
 tick(){this.p(800,.025)},enter(){this.p(500,.05)},err(){this.p(150,.2,"sawtooth")}};
 document.addEventListener("click",function(){A.init()},{once:true});

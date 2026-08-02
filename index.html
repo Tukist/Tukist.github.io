@@ -455,7 +455,7 @@ h2::before{content:'# ';color:var(--fd)}
 
 <script>
 // ── Audio Engine ──
-var Audio={
+var SFX={
   ctx:null,
   init(){try{this.ctx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}},
   play(f,d,t){if(!this.ctx)this.init();if(!this.ctx)return;
@@ -467,31 +467,31 @@ var Audio={
   },
   click:function(){this.play(600,.04)},
   hover:function(){this.play(900,.025)},
-  start:function(){[300,500,700,900].forEach(function(f,i){setTimeout(function(){Audio.play(f,.08)},i*60)})},
-  death:function(){this.play(120,.2,'sawtooth');setTimeout(function(){Audio.play(80,.3,'sawtooth')},150)}
+  start:function(){[300,500,700,900].forEach(function(f,i){setTimeout(function(){SFX.play(f,.08)},i*60)})},
+  death:function(){this.play(120,.2,'sawtooth');setTimeout(function(){SFX.play(80,.3,'sawtooth')},150)}
 };
 
 // init audio on first interaction
-document.addEventListener('click',function(){Audio.init()},{once:true});
-document.addEventListener('keydown',function(){Audio.init()},{once:true});
+document.addEventListener('click',function(){SFX.init()},{once:true});
+document.addEventListener('keydown',function(){SFX.init()},{once:true});
 
 // ── Nav sounds ──
 document.querySelectorAll('.nav-links a, .nav-brand').forEach(function(a){
-  a.addEventListener('mouseenter',function(){Audio.hover()});
+  a.addEventListener('mouseenter',function(){SFX.hover()});
 });
 
 // ── Nav ──
 document.querySelectorAll('a[href^="#"]').forEach(function(a){
   a.addEventListener('click',function(e){
     e.preventDefault();
-    Audio.click();
+    SFX.click();
     var t=document.querySelector(a.getAttribute('href'));
     if(t)t.scrollIntoView({behavior:'smooth'});
     document.getElementById('nl').classList.remove('open');
   });
 });
 document.getElementById('nt').addEventListener('click',function(){
-  Audio.click();document.getElementById('nl').classList.toggle('open');
+  SFX.click();document.getElementById('nl').classList.toggle('open');
 });
 var _sections=document.querySelectorAll('.section, header');
 var _navLinks=document.querySelectorAll('.nav-links a');
@@ -508,7 +508,7 @@ window.addEventListener('scroll',function(){
 
 // ── Card hover sound ──
 document.querySelectorAll('.card,.hero-links a').forEach(function(el){
-  el.addEventListener('mouseenter',function(){Audio.hover()});
+  el.addEventListener('mouseenter',function(){SFX.hover()});
 });
 
 // ── ASCII Ski ──
@@ -569,7 +569,7 @@ function step(){
   if(worldGet(PR,playerCol)==='T'||worldGet(PR,playerCol+1)==='T'){alive=false;end()}
 }
 function end(){
-  alive=false;Audio.death();
+  alive=false;SFX.death();
   if(distance>high){high=distance;localStorage.setItem('jp_ski2_high',high);ghs.textContent=high}
   gs.textContent='
 
@@ -580,11 +580,11 @@ function end(){
   gmsg.textContent='GAME OVER';gsb.textContent='START';gsb.disabled=false;
 }
 function startGame(){
-  Audio.start();init();gsb.textContent='STOP';gsb.disabled=false;draw();
+  SFX.start();init();gsb.textContent='STOP';gsb.disabled=false;draw();
   if(loopId)cancelAnimationFrame(loopId);lastT=0;loopId=requestAnimationFrame(loop);
 }
 function stopGame(){alive=false;gsb.textContent='START';gsb.disabled=false;if(loopId)cancelAnimationFrame(loopId);loopId=0;gmsg.textContent='PAUSED'}
-gsb.onclick=function(){Audio.click();if(alive)stopGame();else startGame()};
+gsb.onclick=function(){SFX.click();if(alive)stopGame();else startGame()};
 var lastT=0,loopId=0;
 function loop(t){if(!alive){loopId=0;return}if(t-lastT>=33){step();draw();lastT=t}loopId=requestAnimationFrame(loop)}
 document.addEventListener('keydown',function(e){
