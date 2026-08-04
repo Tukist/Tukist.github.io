@@ -6,6 +6,10 @@
 <title>Tukist — Terminal</title>
 <style>
 :root{--bg:#0d0d0d;--fg:#e8dcc8;--fd:#6b6050;--fa:#FFA726;--fe:#EF5350;--fc:#81C784;--ff:'Cascadia Code','Courier New',monospace;--fs:16px;--mw:960px}
+[data-theme="light"]{--bg:#f4efe6;--fg:#2a2520;--fd:#8a7a65;--fa:#E67E00;--fe:#D32F2F;--fc:#388E3C}body[data-theme="light"]{text-shadow:none}
+body[data-theme="light"] .crt{display:none}
+body[data-theme="light"] .noise{display:none}
+body[data-theme="light"] .glitch-scan{display:none}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{font-size:var(--fs);scroll-behavior:smooth}
 body{font-family:var(--ff);color:var(--fg);background:var(--bg);line-height:1.6;overflow-x:hidden;text-shadow:0 0 2px rgba(232,220,200,.15)}
@@ -158,6 +162,7 @@ h2::before{content:'# ';color:var(--fd)}
 <nav class="nav"><div class="nav-inner">
   <a href="#" class="nav-brand">tukist<span class="blink">_</span></a>
   <button class="nav-toggle" id="nt">[menu]</button>
+  <button id="theme-btn" style="background:none;border:1px solid var(--fd);color:var(--fg);cursor:pointer;font-family:var(--ff);font-size:.7rem;padding:2px 8px" title="Toggle theme">&#x25D0;</button>
   <div class="nav-links" id="nl">
     <a href="#about" class="on">about</a>
     <a href="#projects">projects</a>
@@ -636,6 +641,19 @@ gmsg.textContent='based on yeti -- classic terminal ski';
     var msgs=['built with care','still counting','you found me!','stop clicking','ok fine','(>_<)','destiny awaits','42','keep going!','persistent!','the answer is 42'];
     el.textContent=clicks<=msgs.length?msgs[clicks-1]:'click #'+clicks;
     if(clicks>=5)el.style.color='var(--fa)';
+  });
+})();
+// ── Theme toggle ──
+(function(){
+  var btn=document.getElementById('theme-btn');
+  var current=localStorage.getItem('theme')||'dark';
+  document.documentElement.setAttribute('data-theme',current);
+  btn.textContent=current==='dark'?'\u25D0':'\u25CB';
+  btn.addEventListener('click',function(){
+    var next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',next);
+    localStorage.setItem('theme',next);
+    btn.textContent=next==='dark'?'\u25D0':'\u25CB';
   });
 })();
 </script>
