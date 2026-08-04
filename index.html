@@ -644,9 +644,11 @@ gmsg.textContent='based on yeti -- classic terminal ski';
     if(clicks>=5)el.style.color='var(--fa)';
   });
 })();
-// ── Theme toggle ──
+</script>
+<script>
 (function(){
   var btn=document.getElementById('theme-btn');
+  if(!btn)return;
   var current=localStorage.getItem('theme')||'dark';
   document.documentElement.setAttribute('data-theme',current);
   btn.textContent=current==='dark'?'\u25D0':'\u25CB';
