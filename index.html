@@ -13,7 +13,8 @@
 [data-theme="light"] .glitch-scan{display:none}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{font-size:var(--fs);scroll-behavior:smooth}
-body{font-family:var(--ff);color:var(--fg);background:var(--bg);line-height:1.6;overflow-x:hidden;text-shadow:0 0 2px rgba(232,220,200,.15)}
+body{font-family:var(--ff);color:var(--fg);background:var(--bg);line-height:1.6;overflow-x:hidden;text-shadow:0 0 2px rgba(232,220,200,.15);transition:background .5s ease,color .5s ease,text-shadow .5s ease}
+*,*::before,*::after{transition:background .5s ease,color .4s ease,border-color .5s ease,box-shadow .5s ease}
 
 /* ── CRT Overlay ── */
 .crt{position:fixed;inset:0;pointer-events:none;z-index:9999}
