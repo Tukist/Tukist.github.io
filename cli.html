@@ -5,16 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tukist CLI</title>
 <style>
-:root{--bg:#0d0d0d;--fg:#e8dcc8;--fd:#6b6050;--fa:#FFA726;--fe:#EF5350;--fc:#81C784}
-[data-theme="light"]{--bg:#f4efe6;--fg:#2a2520;--fd:#8a7a65;--fa:#E67E00;--fe:#D32F2F;--fc:#388E3C}[data-theme="light"] body{text-shadow:none}[data-theme="light"] .crt{display:none}[data-theme="light"] .noise{display:none}
+:root{--bg:#f4efe6;--fg:#2a2520;--fd:#8a7a65;--fa:#E67E00;--fe:#D32F2F;--fc:#388E3C}
+[data-theme="dark"]{--bg:#0d0d0d;--fg:#e8dcc8;--fd:#6b6050;--fa:#FFA726;--fe:#EF5350;--fc:#81C784}[data-theme="dark"] body{text-shadow:0 0 2px rgba(232,220,200,.15)}[data-theme="dark"] .crt{display:block}[data-theme="dark"] .noise{display:block}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
-body{font-family:'Cascadia Code','Consolas','Courier New',monospace;font-size:14px;color:var(--fg);background:var(--bg);text-shadow:0 0 2px rgba(232,220,200,.1)}
-.crt{position:fixed;inset:0;pointer-events:none;z-index:9999}
+body{font-family:'Cascadia Code','Consolas','Courier New',monospace;font-size:14px;color:var(--fg);background:var(--bg)}
+.crt{position:fixed;inset:0;pointer-events:none;z-index:9999;display:none}
 .crt::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px)}
 .crt::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.5) 100%);animation:flicker .15s infinite alternate}
 @keyframes flicker{0%{opacity:.97}100%{opacity:1}}
-.noise{position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:.025;mix-blend-mode:overlay}
+.noise{position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:.025;mix-blend-mode:overlay;display:none}
 .noise::after{content:'';position:absolute;inset:-50%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px 128px;animation:noise .8s steps(4) infinite}
 @keyframes noise{0%,100%{transform:translate(0,0)}25%{transform:translate(-10%,5%)}50%{transform:translate(5%,-10%)}75%{transform:translate(-5%,15%)}}
 .term{height:100%;display:flex;flex-direction:column;position:relative;z-index:1}
@@ -28,7 +28,7 @@ body{font-family:'Cascadia Code','Consolas','Courier New',monospace;font-size:14
 @keyframes blink{50%{opacity:0}}
 #inline{background:none;border:none;color:var(--fg);font:inherit;outline:none;caret-color:var(--fa);width:60vw;text-shadow:0 0 2px rgba(232,220,200,.1)}
 .c-err{color:#ff4444}.c-acc{color:var(--fa)}.c-dim{color:var(--fd)}.c-bold{font-weight:700}
-#theme-btn{position:fixed;top:8px;right:12px;z-index:10000;background:var(--bg);border:1px solid var(--fd);color:var(--fg);cursor:pointer;font-family:var(--ff);font-size:.7rem;padding:2px 8px}
+#theme-btn{position:fixed;top:8px;right:12px;z-index:10000;background:var(--bg);border:1px solid var(--fd);color:var(--fg);cursor:pointer;font-family:'Cascadia Code',monospace;font-size:.7rem;padding:2px 8px}
 </style>
 </head>
 <body>
@@ -37,15 +37,12 @@ body{font-family:'Cascadia Code','Consolas','Courier New',monospace;font-size:14
 <div class="term"><div id="out"></div></div>
 <script>
 var out=document.getElementById("out"),inline,hst=[],hstIdx=-1;
-
 var SFX={ctx:null,init(){try{this.ctx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}},
 p(f,d,t){if(!this.ctx)this.init();if(!this.ctx)return;var o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=t||"square";o.frequency.value=f;g.gain.setValueAtTime(.03,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,this.ctx.currentTime+d);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+d)},
 tick(){this.p(800,.025)},enter(){this.p(500,.05)},err(){this.p(150,.2,"sawtooth")}};
 document.addEventListener("click",function(){SFX.init()},{once:true});
-
 function el(t,c){var d=document.createElement(t);if(c)d.className=c;return d}
 function appendLine(h){var d=el("div","line");d.innerHTML=h;out.appendChild(d);}
-
 function newPrompt(){
 var d=el("div","line");
 var s=el("span","prompt");s.textContent="tukist@cli:~$ ";
@@ -54,7 +51,6 @@ d.appendChild(s);d.appendChild(i);out.appendChild(d);inline=i;inline.focus();
 inline.addEventListener("keydown",handleKey);
 out.scrollTop=out.scrollHeight;
 }
-
 var startupBox=[
 '╭──────────────────────────────────────────────────────────────────────────────────────────────────╮',
 '│ ⣇⣿⠘⣿⣿⣿⡿⡿⣟⣟⢟⢟⢝⠵⡝⣿⡿⢂⣼⣿⣷⣌⠩⡫⡻⣝⠹⢿⣿⣷        Welcome to Tukist CLI!                                     │',
@@ -73,7 +69,6 @@ var startupBox=[
 '│ ⡝⡵⡕⡀⠑⠳⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠛⢉⡠⡲⡫⡪⡪⡣        MCP:       local only                                      │',
 '╰──────────────────────────────────────────────────────────────────────────────────────────────────╯'
 ];
-
 function startup(){
 out.innerHTML="";
 startupBox.forEach(function(line){appendLine(line)});
@@ -81,7 +76,6 @@ appendLine("");
 appendLine("<span class=c-dim>type help to begin</span>");
 newPrompt();
 }
-
 var cmds={};
 cmds.help=function(){
 appendLine("<span class=c-acc>Available commands:</span>");
@@ -92,7 +86,7 @@ appendLine("  skills          - Skills");
 appendLine("  contact, links  - Contact info");
 appendLine("  game, ski       - ASCII Ski game");
 appendLine("  clear, cls      - Clear screen");
-appendLine("  hst         - Command hst");
+appendLine("  hst             - Command history");
 };
 cmds.about=function(){cmds.whoami()};
 cmds.whoami=function(){
@@ -137,7 +131,6 @@ cmds.hst=function(){
 appendLine("<span class=c-acc>hst</span>");
 hst.forEach(function(h,i){appendLine("  "+String(i+1).padStart(3)+"  "+h)});
 };
-// Easter eggs
 cmds.matrix=function(){
 appendLine("<span class=c-acc>Wake up, Neo...</span>");
 appendLine("The Matrix has you...");
@@ -145,7 +138,7 @@ setTimeout(function(){appendLine("Follow the white rabbit.")},500);
 setTimeout(function(){appendLine("<span class=c-dim>knock, knock, Neo.</span>")},1000);
 };
 cmds.konami=function(){
-appendLine("<span class=c-acc>\\u2191\\u2191\\u2193\\u2193\\u2190\\u2192\\u2190\\u2192 B A</span>");
+appendLine("<span class=c-acc>↑↑↓↓←→←→ B A</span>");
 appendLine("<span class=c-dim>You found the secret code!</span>");
 };
 cmds.destiny=function(){
@@ -167,24 +160,10 @@ appendLine("                ||----w |");
 appendLine("                ||     ||");
 };
 cmds.fortune=function(){
-var fortunes=[
-"The only way to do great work is to love what you do. - Steve Jobs",
-"Simplicity is the ultimate sophistication. - Leonardo da Vinci",
-"First, solve the problem. Then, write the code. - John Johnson",
-"Talk is cheap. Show me the code. - Linus Torvalds",
-"Programs must be written for people to read. - Abelson & Sussman",
-"Any fool can write code that a computer can understand. - Martin Fowler",
-"Testing shows the presence, not the absence of bugs. - Dijkstra",
-"Debugging is twice as hard as writing the code. - Brian Kernighan",
-"Perfection is achieved not when there is nothing more to add. - Saint-Exupery",
-"The best error message is the one that never shows up. - Thomas Fuchs"
-];
+var fortunes=["The only way to do great work is to love what you do. - Steve Jobs","Simplicity is the ultimate sophistication. - Leonardo da Vinci","First, solve the problem. Then, write the code. - John Johnson","Talk is cheap. Show me the code. - Linus Torvalds","Testing shows the presence, not the absence of bugs. - Dijkstra","Debugging is twice as hard as writing the code. - Brian Kernighan"];
 appendLine("<span class=c-acc>fortune:</span> "+fortunes[Math.floor(Math.random()*fortunes.length)]);
 };
-cmds.date=function(){
-appendLine(new Date().toString());
-};
-
+cmds.date=function(){appendLine(new Date().toString())};
 function exec(input){
 var args=input.trim().split(/\s+/),c=(args[0]||"").toLowerCase();args.shift();
 SFX.enter();
@@ -192,7 +171,6 @@ if(!c)return;
 if(cmds[c]){cmds[c](args)}
 else{appendLine("<span class=c-err>command not found: "+c+"</span>");SFX.err()}
 }
-
 function handleKey(e){
 if(e.key==="Enter"){
 e.preventDefault();
@@ -217,7 +195,6 @@ var v=inline.value.toLowerCase(),keys=Object.keys(cmds);
 for(var i=0;i<keys.length;i++){if(keys[i].startsWith(v)){inline.value=keys[i];break}}
 }else if(e.key.length===1||e.key==="Backspace"){SFX.tick();}
 }
-
 out.addEventListener("click",function(){if(inline)inline.focus();});
 startup();
 </script>
@@ -225,14 +202,14 @@ startup();
 (function(){
   var btn=document.getElementById('theme-btn');
   if(!btn)return;
-  var current=localStorage.getItem('theme')||'dark';
+  var current=localStorage.getItem('theme')||'light';
   document.documentElement.setAttribute('data-theme',current);
-  btn.textContent=current==='dark'?'\u25D0':'\u25CB';
+  btn.textContent=current==='dark'?'◐':'○';
   btn.addEventListener('click',function(){
     var next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
     document.documentElement.setAttribute('data-theme',next);
     localStorage.setItem('theme',next);
-    btn.textContent=next==='dark'?'\u25D0':'\u25CB';
+    btn.textContent=next==='dark'?'◐':'○';
   });
 })();
 </script>
