@@ -5,19 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tukist — Terminal</title>
 <style>
-:root{--bg:#0d0d0d;--fg:#e8dcc8;--fd:#6b6050;--fa:#FFA726;--fe:#EF5350;--fc:#81C784;--ff:'Cascadia Code','Courier New',monospace;--fs:16px;--mw:960px}
-[data-theme="light"]{--bg:#f4efe6;--fg:#2a2520;--fd:#8a7a65;--fa:#E67E00;--fe:#D32F2F;--fc:#388E3C}
-[data-theme="light"] body{text-shadow:none}
-[data-theme="light"] .crt{display:none}
-[data-theme="light"] .noise{display:none}
-[data-theme="light"] .glitch-scan{display:none}
+:root{--bg:#f4efe6;--fg:#2a2520;--fd:#8a7a65;--fa:#E67E00;--fe:#D32F2F;--fc:#388E3C;--ff:'Cascadia Code','Courier New',monospace;--fs:16px;--mw:960px}
+[data-theme="dark"]{--bg:#0d0d0d;--fg:#e8dcc8;--fd:#6b6050;--fa:#FFA726;--fe:#EF5350;--fc:#81C784}
+[data-theme="dark"] body{text-shadow:0 0 2px rgba(232,220,200,.15)}
+[data-theme="dark"] .crt{display:block}
+[data-theme="dark"] .noise{display:block}
+[data-theme="dark"] .glitch-scan{display:block}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{font-size:var(--fs);scroll-behavior:smooth}
-body{font-family:var(--ff);color:var(--fg);background:var(--bg);line-height:1.6;overflow-x:hidden;text-shadow:0 0 2px rgba(232,220,200,.15);transition:background .5s ease,color .5s ease,text-shadow .5s ease}
+body{font-family:var(--ff);color:var(--fg);background:var(--bg);line-height:1.6;overflow-x:hidden;transition:background .5s ease,color .5s ease,text-shadow .5s ease}
 *,*::before,*::after{transition:background .5s ease,color .4s ease,border-color .5s ease,box-shadow .5s ease}
 
 /* ── CRT Overlay ── */
-.crt{position:fixed;inset:0;pointer-events:none;z-index:9999}
+.crt{position:fixed;inset:0;pointer-events:none;z-index:9999;display:none}
 .crt::before{
   content:'';position:absolute;inset:0;
   background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px);
@@ -30,7 +30,7 @@ body{font-family:var(--ff);color:var(--fg);background:var(--bg);line-height:1.6;
 @keyframes flicker{0%{opacity:.98}100%{opacity:1}}
 
 /* ── Noise ── */
-.noise{position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:.03;mix-blend-mode:overlay}
+.noise{position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:.03;mix-blend-mode:overlay;display:none}
 .noise::after{
   content:'';position:absolute;inset:-50%;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -44,8 +44,8 @@ a{color:var(--fa);text-decoration:none;transition:all .1s}
 a:hover{color:var(--fg);text-shadow:0 0 8px var(--fg)}
 
 /* ── Nav ── */
-.nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.92);border-bottom:1px solid var(--fd);backdrop-filter:blur(2px)}
-[data-theme="light"] .nav{background:rgba(244,239,230,.92)}
+.nav{position:sticky;top:0;z-index:100;background:rgba(244,239,230,.92);border-bottom:1px solid var(--fd);backdrop-filter:blur(2px)}
+[data-theme="dark"] .nav{background:rgba(10,10,10,.92)}
 .nav-inner{max-width:var(--mw);margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:50px}
 .nav-brand{color:var(--fa);font-weight:700;font-size:.9rem;border:none;background:none;cursor:pointer;font-family:var(--ff)}
 .nav-brand .blink{animation:blink 1s step-end infinite}
@@ -71,6 +71,17 @@ h2::before{content:'# ';color:var(--fd)}
 /* ── Cards ── */
 .card{border:1px solid var(--fd);padding:1.2rem;background:rgba(107,96,80,.04);transition:all .15s}
 .card:hover{border-color:var(--fg);background:rgba(107,96,80,.08)}
+.article-item{border:1px solid var(--fd);padding:1.2rem 1.4rem;margin-bottom:1rem;transition:all .3s;background:rgba(107,96,80,.04)}
+.article-item:hover{border-color:var(--fa)}
+.article-item h3{margin-bottom:.3rem}
+.article-item h3 a{color:var(--fg);text-decoration:none;font-size:1.05rem}
+.article-item h3 a:hover{color:var(--fa)}
+.article-item .meta{font-size:.72rem;color:var(--fd);margin-bottom:.5rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+.article-item .desc{font-size:.82rem;color:var(--fd);line-height:1.6;margin-bottom:.6rem}
+.article-item .read{font-size:.75rem;color:var(--fa);text-decoration:none}
+.article-item .read:hover{text-decoration:underline}
+.article-item .tags{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem}
+.article-item .tags span{font-size:.66rem;border:1px solid var(--fd);color:var(--fd);padding:0 7px}
 .ca{border-left:3px solid var(--fa)}
 .card-title{font-weight:700;font-size:.88rem;color:var(--fa);margin-bottom:4px}
 .card-meta{font-size:.68rem;color:var(--fd);margin-bottom:.5rem}
@@ -167,6 +178,7 @@ h2::before{content:'# ';color:var(--fd)}
   <button class="nav-toggle" id="nt">[menu]</button>
   <div class="nav-links" id="nl">
     <a href="#about" class="on">about</a>
+    <a href="#blog">blog</a>
     <a href="#projects">projects</a>
     <a href="#skills">skills</a>
     <a href="#game">game</a>
@@ -245,6 +257,15 @@ h2::before{content:'# ';color:var(--fd)}
     <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">2024 — NOW</div><div class="tl-title">BUAA Undergraduate</div><div class="tl-desc">CS coursework &#xb7; OpenBUAA full-stack development</div></div>
     <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">2025</div><div class="tl-title">JMComic-Crawler-Python OSS</div><div class="tl-desc">Python crawler framework maintenance &amp; feature expansion</div></div>
     <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">2026</div><div class="tl-title">AI Agent Security Research</div><div class="tl-desc">Exploring AI coding assistant security boundaries &#xb7; Kimi Code CLI</div></div>
+  </div>
+</div></section>
+
+<section class="section" id="blog"><div class="container">
+  <span class="stag">blog</span>
+  <h2>articles</h2>
+  <p class="ts mb">我的文章。阅读全文 → 看完整内容。</p>
+  <div id="article-list">
+    <p class="ts">加载中...</p>
   </div>
 </div></section>
 
@@ -651,7 +672,7 @@ gmsg.textContent='based on yeti -- classic terminal ski';
 (function(){
   var btn=document.getElementById('theme-btn');
   if(!btn)return;
-  var current=localStorage.getItem('theme')||'dark';
+  var current=localStorage.getItem('theme')||'light';
   document.documentElement.setAttribute('data-theme',current);
   btn.textContent=current==='dark'?'\u25D0':'\u25CB';
   btn.addEventListener('click',function(){
@@ -660,6 +681,26 @@ gmsg.textContent='based on yeti -- classic terminal ski';
     localStorage.setItem('theme',next);
     btn.textContent=next==='dark'?'\u25D0':'\u25CB';
   });
+})();
+</script>
+<script>
+(function(){
+  var list=document.getElementById('article-list');
+  if(!list)return;
+  fetch('articles/index.json').then(function(r){return r.json()}).then(function(articles){
+    if(!articles.length){list.innerHTML='<p class="ts">暂无文章。</p>';return}
+    articles.sort(function(a,b){return b.date.localeCompare(a.date)});
+    list.innerHTML=articles.map(function(a){
+      var h='<div class="article-item">';
+      h+='<h3><a href="article.html?slug='+a.slug+'">'+a.title+'</a></h3>';
+      h+='<div class="meta"><span>'+a.date+'</span></div>';
+      if(a.description)h+='<div class="desc">'+a.description+'</div>';
+      if(a.tags&&a.tags.length)h+='<div class="tags">'+a.tags.map(function(t){return '<span>'+t+'</span>'}).join('')+'</div>';
+      h+='<div style="margin-top:.6rem"><a class="read" href="article.html?slug='+a.slug+'">阅读全文 →</a></div>';
+      h+='</div>';
+      return h;
+    }).join('');
+  }).catch(function(e){list.innerHTML='<p class="ts">加载失败: '+e.message+'</p>'});
 })();
 </script>
 </body>

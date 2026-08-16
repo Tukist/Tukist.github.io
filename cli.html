@@ -28,7 +28,7 @@ body{font-family:'Cascadia Code','Consolas','Courier New',monospace;font-size:14
 @keyframes blink{50%{opacity:0}}
 #inline{background:none;border:none;color:var(--fg);font:inherit;outline:none;caret-color:var(--fa);width:60vw;text-shadow:0 0 2px rgba(232,220,200,.1)}
 .c-err{color:#ff4444}.c-acc{color:var(--fa)}.c-dim{color:var(--fd)}.c-bold{font-weight:700}
-#theme-btn{position:fixed;top:8px;right:12px;z-index:10000;background:var(--bg);border:1px solid var(--fd);color:var(--fg);cursor:pointer;font-family:'Cascadia Code',monospace;font-size:.7rem;padding:2px 8px}
+#theme-btn{position:fixed;top:8px;right:12px;z-index:10000;background:var(--bg);border:1px solid var(--fd);color:var(--fg);cursor:pointer;font-family:var(--ff);font-size:.7rem;padding:2px 8px}
 </style>
 </head>
 <body>
@@ -37,12 +37,15 @@ body{font-family:'Cascadia Code','Consolas','Courier New',monospace;font-size:14
 <div class="term"><div id="out"></div></div>
 <script>
 var out=document.getElementById("out"),inline,hst=[],hstIdx=-1;
+
 var SFX={ctx:null,init(){try{this.ctx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}},
 p(f,d,t){if(!this.ctx)this.init();if(!this.ctx)return;var o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=t||"square";o.frequency.value=f;g.gain.setValueAtTime(.03,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,this.ctx.currentTime+d);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+d)},
 tick(){this.p(800,.025)},enter(){this.p(500,.05)},err(){this.p(150,.2,"sawtooth")}};
 document.addEventListener("click",function(){SFX.init()},{once:true});
+
 function el(t,c){var d=document.createElement(t);if(c)d.className=c;return d}
 function appendLine(h){var d=el("div","line");d.innerHTML=h;out.appendChild(d);}
+
 function newPrompt(){
 var d=el("div","line");
 var s=el("span","prompt");s.textContent="tukist@cli:~$ ";
@@ -51,6 +54,7 @@ d.appendChild(s);d.appendChild(i);out.appendChild(d);inline=i;inline.focus();
 inline.addEventListener("keydown",handleKey);
 out.scrollTop=out.scrollHeight;
 }
+
 var startupBox=[
 '╭──────────────────────────────────────────────────────────────────────────────────────────────────╮',
 '│ ⣇⣿⠘⣿⣿⣿⡿⡿⣟⣟⢟⢟⢝⠵⡝⣿⡿⢂⣼⣿⣷⣌⠩⡫⡻⣝⠹⢿⣿⣷        Welcome to Tukist CLI!                                     │',
@@ -69,6 +73,7 @@ var startupBox=[
 '│ ⡝⡵⡕⡀⠑⠳⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠛⢉⡠⡲⡫⡪⡪⡣        MCP:       local only                                      │',
 '╰──────────────────────────────────────────────────────────────────────────────────────────────────╯'
 ];
+
 function startup(){
 out.innerHTML="";
 startupBox.forEach(function(line){appendLine(line)});
@@ -76,6 +81,7 @@ appendLine("");
 appendLine("<span class=c-dim>type help to begin</span>");
 newPrompt();
 }
+
 var cmds={};
 cmds.help=function(){
 appendLine("<span class=c-acc>Available commands:</span>");
@@ -86,7 +92,7 @@ appendLine("  skills          - Skills");
 appendLine("  contact, links  - Contact info");
 appendLine("  game, ski       - ASCII Ski game");
 appendLine("  clear, cls      - Clear screen");
-appendLine("  hst             - Command history");
+appendLine("  hst         - Command hst");
 };
 cmds.about=function(){cmds.whoami()};
 cmds.whoami=function(){
@@ -131,6 +137,7 @@ cmds.hst=function(){
 appendLine("<span class=c-acc>hst</span>");
 hst.forEach(function(h,i){appendLine("  "+String(i+1).padStart(3)+"  "+h)});
 };
+// Easter eggs
 cmds.matrix=function(){
 appendLine("<span class=c-acc>Wake up, Neo...</span>");
 appendLine("The Matrix has you...");
@@ -138,7 +145,7 @@ setTimeout(function(){appendLine("Follow the white rabbit.")},500);
 setTimeout(function(){appendLine("<span class=c-dim>knock, knock, Neo.</span>")},1000);
 };
 cmds.konami=function(){
-appendLine("<span class=c-acc>↑↑↓↓←→←→ B A</span>");
+appendLine("<span class=c-acc>\\u2191\\u2191\\u2193\\u2193\\u2190\\u2192\\u2190\\u2192 B A</span>");
 appendLine("<span class=c-dim>You found the secret code!</span>");
 };
 cmds.destiny=function(){
@@ -160,10 +167,24 @@ appendLine("                ||----w |");
 appendLine("                ||     ||");
 };
 cmds.fortune=function(){
-var fortunes=["The only way to do great work is to love what you do. - Steve Jobs","Simplicity is the ultimate sophistication. - Leonardo da Vinci","First, solve the problem. Then, write the code. - John Johnson","Talk is cheap. Show me the code. - Linus Torvalds","Testing shows the presence, not the absence of bugs. - Dijkstra","Debugging is twice as hard as writing the code. - Brian Kernighan"];
+var fortunes=[
+"The only way to do great work is to love what you do. - Steve Jobs",
+"Simplicity is the ultimate sophistication. - Leonardo da Vinci",
+"First, solve the problem. Then, write the code. - John Johnson",
+"Talk is cheap. Show me the code. - Linus Torvalds",
+"Programs must be written for people to read. - Abelson & Sussman",
+"Any fool can write code that a computer can understand. - Martin Fowler",
+"Testing shows the presence, not the absence of bugs. - Dijkstra",
+"Debugging is twice as hard as writing the code. - Brian Kernighan",
+"Perfection is achieved not when there is nothing more to add. - Saint-Exupery",
+"The best error message is the one that never shows up. - Thomas Fuchs"
+];
 appendLine("<span class=c-acc>fortune:</span> "+fortunes[Math.floor(Math.random()*fortunes.length)]);
 };
-cmds.date=function(){appendLine(new Date().toString())};
+cmds.date=function(){
+appendLine(new Date().toString());
+};
+
 function exec(input){
 var args=input.trim().split(/\s+/),c=(args[0]||"").toLowerCase();args.shift();
 SFX.enter();
@@ -171,6 +192,7 @@ if(!c)return;
 if(cmds[c]){cmds[c](args)}
 else{appendLine("<span class=c-err>command not found: "+c+"</span>");SFX.err()}
 }
+
 function handleKey(e){
 if(e.key==="Enter"){
 e.preventDefault();
@@ -195,6 +217,7 @@ var v=inline.value.toLowerCase(),keys=Object.keys(cmds);
 for(var i=0;i<keys.length;i++){if(keys[i].startsWith(v)){inline.value=keys[i];break}}
 }else if(e.key.length===1||e.key==="Backspace"){SFX.tick();}
 }
+
 out.addEventListener("click",function(){if(inline)inline.focus();});
 startup();
 </script>
@@ -204,12 +227,12 @@ startup();
   if(!btn)return;
   var current=localStorage.getItem('theme')||'light';
   document.documentElement.setAttribute('data-theme',current);
-  btn.textContent=current==='dark'?'◐':'○';
+  btn.textContent=current==='dark'?'\u25D0':'\u25CB';
   btn.addEventListener('click',function(){
     var next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
     document.documentElement.setAttribute('data-theme',next);
     localStorage.setItem('theme',next);
-    btn.textContent=next==='dark'?'◐':'○';
+    btn.textContent=next==='dark'?'\u25D0':'\u25CB';
   });
 })();
 </script>

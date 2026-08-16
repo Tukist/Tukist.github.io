@@ -51,8 +51,12 @@ hr{border:none;border-top:1px solid var(--fd);margin:2rem 0;opacity:.4}
   var slug=params.get('slug');
   var content=document.getElementById('content');
   if(!slug){content.innerHTML='<p style="color:var(--fe)">缺少文章参数 ?slug=xxx</p>';return}
+
+  // 主题
   var theme=localStorage.getItem('theme')||'light';
   document.documentElement.setAttribute('data-theme',theme);
+
+  // 加载文章
   Promise.all([
     fetch('articles/index.json').then(function(r){return r.json()}),
     fetch('articles/'+slug+'.md').then(function(r){return r.text()})
@@ -61,9 +65,13 @@ hr{border:none;border-top:1px solid var(--fd);margin:2rem 0;opacity:.4}
     var md=results[1];
     var meta=index.find(function(a){return a.slug===slug});
     if(!meta){content.innerHTML='<p style="color:var(--fe)">文章未找到: '+slug+'</p>';return}
+
+    // 剥离 front matter
     var body=md;
     var fm=body.match(/^---\n([\s\S]*?)\n---\n?/);
     if(fm){body=body.slice(fm[0].length)}
+
+    // 渲染
     document.title=meta.title+' — Tukist';
     var html='<h1>'+meta.title+'</h1>';
     html+='<div class="meta"><span class="date">'+meta.date+'</span>';
