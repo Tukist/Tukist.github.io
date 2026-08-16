@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文章 — Tukist</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+:root{--bg:#f4efe6;--fg:#2a2520;--fd:#8a7a65;--fa:#E67E00;--fe:#D32F2F;--fc:#388E3C;--ff:'Cascadia Code','Courier New',monospace}
+[data-theme="dark"]{--bg:#0d0d0d;--fg:#e8dcc8;--fd:#6b6050;--fa:#FFA726;--fe:#EF5350;--fc:#81C784}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Cascadia Code','Courier New',monospace;background:var(--bg);color:var(--fg);line-height:1.8;transition:background .4s,color .4s}
+.container{max-width:760px;margin:0 auto;padding:2rem 1.5rem}
+.back{display:inline-block;color:var(--fa);text-decoration:none;margin-bottom:2rem;font-size:.8rem}
+.back:hover{text-decoration:underline}
+h1{font-size:1.8rem;line-height:1.3;margin-bottom:.8rem;color:var(--fg)}
+.meta{font-size:.78rem;color:var(--fd);margin-bottom:1rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+.meta .date{color:var(--fd)}
+.tags{display:flex;gap:.5rem;flex-wrap:wrap}
+.tag{font-size:.68rem;border:1px solid var(--fd);color:var(--fd);padding:1px 8px}
+.desc{font-size:.9rem;color:var(--fd);margin-bottom:2rem;border-left:3px solid var(--fa);padding-left:1rem}
+hr{border:none;border-top:1px solid var(--fd);margin:2rem 0;opacity:.4}
+.article-body{font-size:.95rem;line-height:1.9}
+.article-body h1{font-size:1.4rem;margin:1.8rem 0 .8rem}
+.article-body h2{font-size:1.2rem;margin:1.6rem 0 .7rem}
+.article-body h3{font-size:1.05rem;margin:1.4rem 0 .6rem}
+.article-body p{margin:.8rem 0}
+.article-body ul,.article-body ol{margin:.8rem 0 .8rem 1.5rem}
+.article-body li{margin:.3rem 0}
+.article-body code{font-family:var(--ff);background:rgba(138,122,101,.12);padding:1px 5px;font-size:.85em}
+.article-body pre{background:rgba(138,122,101,.12);padding:1rem;overflow-x:auto;margin:1rem 0;font-size:.82rem;line-height:1.6}
+.article-body pre code{background:none;padding:0}
+.article-body blockquote{border-left:3px solid var(--fa);padding:.5rem 1rem;margin:1rem 0;color:var(--fd);background:rgba(138,122,101,.06)}
+.article-body a{color:var(--fa)}
+.article-body img{max-width:100%;height:auto}
+.article-body table{border-collapse:collapse;width:100%;margin:1rem 0}
+.article-body th,.article-body td{border:1px solid var(--fd);padding:.5rem .8rem;text-align:left}
+.article-body th{background:rgba(138,122,101,.1)}
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="index.html" class="back">← 返回</a>
+  <div id="content">
+    <p style="color:var(--fd)">加载中...</p>
+  </div>
+</div>
+<script>
+(function(){
+  var params=new URLSearchParams(location.search);
+  var slug=params.get('slug');
+  var content=document.getElementById('content');
+  if(!slug){content.innerHTML='<p style="color:var(--fe)">缺少文章参数 ?slug=xxx</p>';return}
+  var theme=localStorage.getItem('theme')||'light';
+  document.documentElement.setAttribute('data-theme',theme);
+  Promise.all([
+    fetch('articles/index.json').then(function(r){return r.json()}),
+    fetch('articles/'+slug+'.md').then(function(r){return r.text()})
+  ]).then(function(results){
+    var index=results[0];
+    var md=results[1];
+    var meta=index.find(function(a){return a.slug===slug});
+    if(!meta){content.innerHTML='<p style="color:var(--fe)">文章未找到: '+slug+'</p>';return}
+    var body=md;
+    var fm=body.match(/^---\n([\s\S]*?)\n---\n?/);
+    if(fm){body=body.slice(fm[0].length)}
+    document.title=meta.title+' — Tukist';
+    var html='<h1>'+meta.title+'</h1>';
+    html+='<div class="meta"><span class="date">'+meta.date+'</span>';
+    html+='<div class="tags">'+meta.tags.map(function(t){return '<span class="tag">'+t+'</span>'}).join('')+'</div></div>';
+    if(meta.description)html+='<div class="desc">'+meta.description+'</div>';
+    html+='<hr>';
+    html+='<div class="article-body">'+(marked.parse?marked.parse(body):marked(body))+'</div>';
+    content.innerHTML=html;
+  }).catch(function(e){
+    content.innerHTML='<p style="color:var(--fe)">加载失败: '+e.message+'</p>';
+  });
+})();
+</script>
+</body>
+</html>
