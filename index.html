@@ -82,6 +82,14 @@ h2::before{content:'# ';color:var(--fd)}
 .article-item .read:hover{text-decoration:underline}
 .article-item .tags{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem}
 .article-item .tags span{font-size:.66rem;border:1px solid var(--fd);color:var(--fd);padding:0 7px}
+/* 章节目录滚动条（滚动时显示，停止后淡出） */
+#book-toc-box::-webkit-scrollbar{width:5px}
+#book-toc-box::-webkit-scrollbar-track{background:transparent}
+#book-toc-box::-webkit-scrollbar-thumb{background:transparent;transition:background .4s ease}
+#book-toc-box.scrolling::-webkit-scrollbar-thumb{background:var(--fd)}
+#book-toc-box.scrolling::-webkit-scrollbar-thumb:hover{background:var(--fa)}
+#book-toc-box{scrollbar-width:thin;scrollbar-color:transparent transparent}
+#book-toc-box.scrolling{scrollbar-color:var(--fd) transparent}
 .ca{border-left:3px solid var(--fa)}
 .card-title{font-weight:700;font-size:.88rem;color:var(--fa);margin-bottom:4px}
 .card-meta{font-size:.68rem;color:var(--fd);margin-bottom:.5rem}
@@ -279,11 +287,11 @@ h2::before{content:'# ';color:var(--fd)}
       <h3 style="font-size:1.1rem;margin-bottom:.5rem">《肠子》</h3>
       <p class="ts">恰克·帕拉尼克 著 · 共 <strong id="book-ch-count">--</strong> 章</p>
       <p class="ts mt" style="line-height:1.7">一本关于人性阴暗面的短篇小说集。点击进入阅读器，左侧目录可折叠，章节间交叉淡化切换。</p>
-      <div class="hero-links mt2" style="display:flex;gap:1rem">
-        <a href="reader.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:1px solid var(--fg);color:var(--fg);font-size:.78rem;font-weight:600;text-decoration:none;transition:all .15s">开始阅读 →</a>
+      <div class="mt2" style="display:flex;gap:1rem">
+        <a href="reader.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:1px solid var(--fa);color:var(--fa);font-size:.78rem;font-weight:600;text-decoration:none;transition:all .15s" onmouseover="this.style.background='var(--fa)';this.style.color='var(--bg)'" onmouseout="this.style.background='transparent';this.style.color='var(--fa)'">开始阅读 →</a>
       </div>
     </div>
-    <div class="card" style="max-height:280px;overflow-y:auto">
+    <div class="card" id="book-toc-box" style="max-height:280px;overflow-y:auto">
       <p class="ts mb" style="font-weight:600">章节目录</p>
       <ul class="ll" id="book-toc">
         <li><span class="ts">加载中...</span></li>
@@ -730,7 +738,19 @@ gmsg.textContent='based on yeti -- classic terminal ski';
 (function(){
   var toc=document.getElementById('book-toc');
   var count=document.getElementById('book-ch-count');
+  var box=document.getElementById('book-toc-box');
   if(!toc)return;
+
+  // 滚动条：滚动时显示，停止后淡出
+  if(box){
+    var t;
+    box.addEventListener('scroll',function(){
+      box.classList.add('scrolling');
+      clearTimeout(t);
+      t=setTimeout(function(){box.classList.remove('scrolling')},1000);
+    });
+  }
+
   fetch('book/index.json').then(function(r){return r.json()}).then(function(chapters){
     if(count)count.textContent=chapters.length;
     if(!chapters.length){toc.innerHTML='<li><span class="ts">暂无章节</span></li>';return}
