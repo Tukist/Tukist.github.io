@@ -96,7 +96,7 @@ a:hover{text-decoration:underline}
 <div class="topbar">
   <div class="left">
     <a href="index.html" class="back">&larr; 返回</a>
-    <span class="book-title">在线读书 · 苍蝇</span>
+    <select id="book-select" title="选择书籍" style="background:var(--bg);border:1px solid var(--fd);color:var(--fg);font-family:var(--ff);font-size:.78rem;padding:3px 6px;cursor:pointer;max-width:180px"></select>
   </div>
   <div class="right">
     <button class="toc-btn" id="toc-btn" title="目录">目录</button>
@@ -122,7 +122,9 @@ a:hover{text-decoration:underline}
 
 <script>
 (function(){
-  var chapters = [];       // [{id,title}]
+  var books = [];          // [{slug,title,author}]
+  var bookSlug = '';       // 当前书籍
+  var chapters = [];       // 当前书章节 [{id,title}]
   var currentIndex = -1;
 
   var $article = document.getElementById('article');
@@ -130,6 +132,7 @@ a:hover{text-decoration:underline}
   var $prev = document.getElementById('prev');
   var $next = document.getElementById('next');
   var $pos = document.getElementById('pos');
+  var $bookSelect = document.getElementById('book-select');
 
   // ── 主题 ──
   var themeBtn = document.getElementById('theme-btn');
@@ -143,12 +146,10 @@ a:hover{text-decoration:underline}
     themeBtn.textContent = next === 'dark' ? '\u25D0' : '\u25CB';
   });
 
-  // ── 目录开关（桌面折叠 / 移动端展开） ──
+  // ── 目录开关 ──
   var tocBtn = document.getElementById('toc-btn');
   var sidebar = document.getElementById('sidebar');
   var layout = document.querySelector('.layout');
-
-  // ── 目录滚动条：滚动时显示，停止后淡出 ──
   var scrollTimer;
   sidebar.addEventListener('scroll', function(){
     sidebar.classList.add('scrolling');
@@ -156,23 +157,14 @@ a:hover{text-decoration:underline}
     scrollTimer = setTimeout(function(){ sidebar.classList.remove('scrolling'); }, 1000);
   });
   tocBtn.addEventListener('click', function(){
-    if (window.innerWidth > 820){
-      layout.classList.toggle('collapsed');
-    } else {
-      sidebar.classList.toggle('open');
-    }
+    if (window.innerWidth > 820){ layout.classList.toggle('collapsed'); }
+    else { sidebar.classList.toggle('open'); }
   });
 
   // ── 工具 ──
-  function renderMarkdown(md){
-    return marked.parse ? marked.parse(md) : marked(md);
-  }
-
-  // ── 定位到某章 ──
+  function renderMarkdown(md){ return marked.parse ? marked.parse(md) : marked(md); }
   function locate(id){
-    for (var i = 0; i < chapters.length; i++){
-      if (chapters[i].id === id) return i;
-    }
+    for (var i = 0; i < chapters.length; i++){ if (chapters[i].id === id) return i; }
     return -1;
   }
 
@@ -182,37 +174,29 @@ a:hover{text-decoration:underline}
     currentIndex = index;
     var ch = chapters[index];
 
-    // 高亮目录
     var links = $list.querySelectorAll('a');
     links.forEach(function(a, i){
       a.classList.toggle('active', i === index);
       if (i === index) a.scrollIntoView({block:'nearest'});
     });
 
-    // 上/下章按钮状态
     $prev.classList.toggle('disabled', index === 0);
     $next.classList.toggle('disabled', index === chapters.length - 1);
     $pos.textContent = (index + 1) + ' / ' + chapters.length;
 
-    // 同步 URL（不刷新）
     var url = new URL(location.href);
+    url.searchParams.set('book', bookSlug);
     url.searchParams.set('ch', ch.id);
     history.replaceState(null, '', url.toString());
-
     document.title = ch.title + ' — Tukist';
 
-    // 重叠交叉淡化：淡出到一半就换内容开始淡入
     $article.classList.remove('show');
     setTimeout(function(){
-      fetch('book/' + ch.id + '.md?v='+Date.now())
-        .then(function(r){
-          if (!r.ok) throw new Error('HTTP ' + r.status);
-          return r.text();
-        })
+      fetch('book/' + bookSlug + '/' + ch.id + '.md?v='+Date.now())
+        .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
         .then(function(md){
           $article.innerHTML = '<div class="article-body">' + renderMarkdown(md) + '</div>';
           window.scrollTo(0, 0);
-          // 强制重排后立即加 show，让淡入与尚未结束的淡出重叠
           void $article.offsetWidth;
           $article.classList.add('show');
         })
@@ -223,46 +207,71 @@ a:hover{text-decoration:underline}
     }, 300);
   }
 
-  // ── 初始化 ──
+  // ── 加载某本书的章节列表 ──
+  function loadBook(slug){
+    bookSlug = slug;
+    fetch('book/' + slug + '/index.json?v='+Date.now())
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        chapters = data;
+        if (!chapters.length){ $article.innerHTML = '<p class="error">没有找到章节。</p>'; return; }
+
+        $list.innerHTML = chapters.map(function(ch, i){
+          return '<li><a href="?book=' + slug + '&ch=' + ch.id + '" data-index="' + i + '">' +
+                 '<span class="idx">' + String(i + 1).padStart(2, '0') + '</span>' + ch.title + '</a></li>';
+        }).join('');
+
+        var params = new URLSearchParams(location.search);
+        var idx = locate(params.get('ch'));
+        if (idx === -1) idx = 0;
+        loadChapter(idx);
+      })
+      .catch(function(e){
+        $article.innerHTML = '<p class="error">章节目录加载失败: ' + e.message + '</p>';
+      });
+  }
+
+  // ── 目录点击 / 上/下章 ──
+  $list.addEventListener('click', function(e){
+    var a = e.target.closest('a');
+    if (!a) return;
+    e.preventDefault();
+    loadChapter(parseInt(a.getAttribute('data-index'), 10));
+    sidebar.classList.remove('open');
+  });
+  $prev.addEventListener('click', function(e){
+    e.preventDefault();
+    if (currentIndex > 0) loadChapter(currentIndex - 1);
+  });
+  $next.addEventListener('click', function(e){
+    e.preventDefault();
+    if (currentIndex < chapters.length - 1) loadChapter(currentIndex + 1);
+  });
+
+  // ── 书籍切换 ──
+  $bookSelect.addEventListener('change', function(){
+    loadBook($bookSelect.value);
+  });
+
+  // ── 初始化：加载书籍列表 ──
   fetch('book/index.json?v='+Date.now())
     .then(function(r){ return r.json(); })
     .then(function(data){
-      chapters = data;
-      if (!chapters.length){ $article.innerHTML = '<p class="error">没有找到章节。</p>'; return; }
+      books = data;
+      if (!books.length){ $article.innerHTML = '<p class="error">没有书籍。</p>'; return; }
 
-      // 生成目录
-      $list.innerHTML = chapters.map(function(ch, i){
-        return '<li><a href="?ch=' + ch.id + '" data-index="' + i + '">' +
-               '<span class="idx">' + String(i + 1).padStart(2, '0') + '</span>' + ch.title + '</a></li>';
+      $bookSelect.innerHTML = books.map(function(b){
+        return '<option value="' + b.slug + '">' + b.title + (b.author ? ' · ' + b.author : '') + '</option>';
       }).join('');
 
-      // 目录点击（阻止默认跳转，交给 loadChapter 处理）
-      $list.addEventListener('click', function(e){
-        var a = e.target.closest('a');
-        if (!a) return;
-        e.preventDefault();
-        loadChapter(parseInt(a.getAttribute('data-index'), 10));
-        sidebar.classList.remove('open');
-      });
-
-      // 上/下章
-      $prev.addEventListener('click', function(e){
-        e.preventDefault();
-        if (currentIndex > 0) loadChapter(currentIndex - 1);
-      });
-      $next.addEventListener('click', function(e){
-        e.preventDefault();
-        if (currentIndex < chapters.length - 1) loadChapter(currentIndex + 1);
-      });
-
-      // 定位到 URL 指定的章节
       var params = new URLSearchParams(location.search);
-      var idx = locate(params.get('ch'));
-      if (idx === -1) idx = 0;
-      loadChapter(idx);
+      var slug = params.get('book') || books[0].slug;
+      if (!books.some(function(b){ return b.slug === slug; })) slug = books[0].slug;
+      $bookSelect.value = slug;
+      loadBook(slug);
     })
     .catch(function(e){
-      $article.innerHTML = '<p class="error">目录加载失败: ' + e.message + '</p>';
+      $article.innerHTML = '<p class="error">书籍列表加载失败: ' + e.message + '</p>';
     });
 })();
 </script>
