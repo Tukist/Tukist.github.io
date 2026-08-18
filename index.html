@@ -179,7 +179,7 @@ h2::before{content:'# ';color:var(--fd)}
   <div class="nav-links" id="nl">
     <a href="#about" class="on">about</a>
     <a href="#blog">blog</a>
-    <a href="reader.html">book</a>
+    <a href="#book">book</a>
     <a href="#projects">projects</a>
     <a href="#skills">skills</a>
     <a href="#game">game</a>
@@ -267,6 +267,28 @@ h2::before{content:'# ';color:var(--fd)}
   <p class="ts mb">我的文章。阅读全文 → 看完整内容。</p>
   <div id="article-list">
     <p class="ts">加载中...</p>
+  </div>
+</div></section>
+
+<section class="section" id="book"><div class="container">
+  <span class="stag">book</span>
+  <h2>reading</h2>
+  <p class="ts mb">在线阅读。选择章节开始阅读。</p>
+  <div class="grid2 mt2" style="align-items:center">
+    <div>
+      <h3 style="font-size:1.1rem;margin-bottom:.5rem">《肠子》</h3>
+      <p class="ts">恰克·帕拉尼克 著 · 共 <strong id="book-ch-count">--</strong> 章</p>
+      <p class="ts mt" style="line-height:1.7">一本关于人性阴暗面的短篇小说集。点击进入阅读器，左侧目录可折叠，章节间交叉淡化切换。</p>
+      <div class="hero-links mt2" style="display:flex;gap:1rem">
+        <a href="reader.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:1px solid var(--fg);color:var(--fg);font-size:.78rem;font-weight:600;text-decoration:none;transition:all .15s">开始阅读 →</a>
+      </div>
+    </div>
+    <div class="card" style="max-height:280px;overflow-y:auto">
+      <p class="ts mb" style="font-weight:600">章节目录</p>
+      <ul class="ll" id="book-toc">
+        <li><span class="ts">加载中...</span></li>
+      </ul>
+    </div>
   </div>
 </div></section>
 
@@ -702,6 +724,20 @@ gmsg.textContent='based on yeti -- classic terminal ski';
       return h;
     }).join('');
   }).catch(function(e){list.innerHTML='<p class="ts">加载失败: '+e.message+'</p>'});
+})();
+</script>
+<script>
+(function(){
+  var toc=document.getElementById('book-toc');
+  var count=document.getElementById('book-ch-count');
+  if(!toc)return;
+  fetch('book/index.json').then(function(r){return r.json()}).then(function(chapters){
+    if(count)count.textContent=chapters.length;
+    if(!chapters.length){toc.innerHTML='<li><span class="ts">暂无章节</span></li>';return}
+    toc.innerHTML=chapters.map(function(ch,i){
+      return '<li><span class="lb">'+String(i+1).padStart(2,'0')+'</span><a href="reader.html?ch='+ch.id+'">'+ch.title+'</a><span class="ar">&rarr;</span></li>';
+    }).join('');
+  }).catch(function(e){toc.innerHTML='<li><span class="ts">加载失败: '+e.message+'</span></li>'});
 })();
 </script>
 </body>
