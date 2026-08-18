@@ -204,7 +204,7 @@ a:hover{text-decoration:underline}
     // 重叠交叉淡化：淡出到一半就换内容开始淡入
     $article.classList.remove('show');
     setTimeout(function(){
-      fetch('book/' + ch.id + '.md')
+      fetch('book/' + ch.id + '.md?v='+Date.now())
         .then(function(r){
           if (!r.ok) throw new Error('HTTP ' + r.status);
           return r.text();
@@ -224,7 +224,7 @@ a:hover{text-decoration:underline}
   }
 
   // ── 初始化 ──
-  fetch('book/index.json')
+  fetch('book/index.json?v='+Date.now())
     .then(function(r){ return r.json(); })
     .then(function(data){
       chapters = data;

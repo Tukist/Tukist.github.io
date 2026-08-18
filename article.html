@@ -58,8 +58,8 @@ hr{border:none;border-top:1px solid var(--fd);margin:2rem 0;opacity:.4}
 
   // 加载文章
   Promise.all([
-    fetch('articles/index.json').then(function(r){return r.json()}),
-    fetch('articles/'+slug+'.md').then(function(r){return r.text()})
+    fetch('articles/index.json?v='+Date.now()).then(function(r){return r.json()}),
+    fetch('articles/'+slug+'.md?v='+Date.now()).then(function(r){return r.text()})
   ]).then(function(results){
     var index=results[0];
     var md=results[1];

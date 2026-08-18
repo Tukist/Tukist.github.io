@@ -718,7 +718,7 @@ gmsg.textContent='based on yeti -- classic terminal ski';
 (function(){
   var list=document.getElementById('article-list');
   if(!list)return;
-  fetch('articles/index.json').then(function(r){return r.json()}).then(function(articles){
+  fetch('articles/index.json?v='+Date.now()).then(function(r){return r.json()}).then(function(articles){
     if(!articles.length){list.innerHTML='<p class="ts">暂无文章。</p>';return}
     articles.sort(function(a,b){return b.date.localeCompare(a.date)});
     list.innerHTML=articles.map(function(a){
@@ -751,7 +751,7 @@ gmsg.textContent='based on yeti -- classic terminal ski';
     });
   }
 
-  fetch('book/index.json').then(function(r){return r.json()}).then(function(chapters){
+  fetch('book/index.json?v='+Date.now()).then(function(r){return r.json()}).then(function(chapters){
     if(count)count.textContent=chapters.length;
     if(!chapters.length){toc.innerHTML='<li><span class="ts">暂无章节</span></li>';return}
     toc.innerHTML=chapters.map(function(ch,i){
