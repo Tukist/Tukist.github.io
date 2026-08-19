@@ -71,6 +71,9 @@ a:hover{text-decoration:underline}
 .article-body th,.article-body td{border:1px solid var(--fd);padding:.5rem .8rem;text-align:left}
 .article-body th{background:rgba(138,122,101,.1)}
 .article-body hr{border:none;border-top:1px solid var(--fd);margin:2rem 0;opacity:.4}
+.article-body .fn{position:relative;color:var(--fa);cursor:help;font-size:.72em;vertical-align:super;font-weight:600;border-bottom:1px dotted var(--fd);padding:0 1px}
+.article-body .fn::after{content:attr(data-note);position:absolute;bottom:135%;left:50%;transform:translateX(-50%);background:var(--bg);color:var(--fg);border:1px solid var(--fd);padding:.6rem .9rem;max-width:340px;width:max-content;font-size:.82rem;line-height:1.65;white-space:normal;text-align:left;font-weight:400;vertical-align:baseline;opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:999;box-shadow:0 3px 14px rgba(0,0,0,.22)}
+.article-body .fn:hover::after{opacity:1}
 
 /* ── 上/下章导航 ── */
 .pager{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:2.5rem;padding-top:1.2rem;border-top:1px solid var(--fd)}
